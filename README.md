@@ -4,19 +4,25 @@
 
 ## 安装
 
+需要先安装 [uv](https://docs.astral.sh/uv/getting-started/installation/)：
+
 ```bash
-cd sql_quality_mcp
-pip install fastmcp sqlglot pyyaml
+# macOS
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+克隆项目后，依赖自动管理，无需手动 pip install：
+
+```bash
+git clone git@github.com:BrownCutie/data_analys.git
+cd data_analys
 ```
 
 ## 快速验证
 
 ```bash
-# 启动 MCP 服务
-fastmcp run server.py
-
-# 或者直接用 python 测试
-python3 -c "
+# 测试一下
+uv run python3 -c "
 from checker.runner import RuleRunner
 import json
 runner = RuleRunner()
@@ -47,53 +53,44 @@ print(json.dumps(result, ensure_ascii=False, indent=2))
 
 ## 配置 MCP 客户端
 
+以下配置中 `PROJECT_DIR` 替换为实际路径，例如 `/Users/browncutie/Programme/data_analysis`。
+
 ### OpenCode
 
-编辑 OpenCode 配置文件：
-
-```bash
-open ~/.config/opencode/opencode.json
-```
-
-添加以下内容（路径替换为你的实际路径）：
+编辑 `~/.config/opencode/opencode.json`：
 
 ```json
 {
   "mcp": {
     "spark-sql-quality": {
       "type": "local",
-      "command": ["python3", "/Users/browncutie/Programme/data_analysis/sql_quality_mcp/server.py"]
+      "command": ["uv", "run", "--directory", "PROJECT_DIR", "fastmcp", "run", "server.py"]
     }
   }
 }
 ```
 
-或者用 CLI 添加：
+或用 CLI：
 
 ```bash
 opencode mcp add
 # Name: spark-sql-quality
 # Type: local
-# Command: python3 /Users/browncutie/Programme/data_analysis/sql_quality_mcp/server.py
+# Command: uv run --directory PROJECT_DIR fastmcp run server.py
 ```
 
-重启 OpenCode 后生效。在对话中可以让 Agent 检查 SQL：
-
-```
-帮我检查这条 SQL 是否符合规范：
-SELECT DISTINCT user_id FROM dwd_xxx_click_di WHERE pt_d = '20260501'
-```
+重启 OpenCode 后生效。
 
 ### Claude Code
 
-在项目根目录创建 `.mcp.json`：
+在项目目录下创建 `.mcp.json`：
 
 ```json
 {
   "mcpServers": {
     "spark-sql-quality": {
-      "command": "python3",
-      "args": ["/Users/browncutie/Programme/data_analysis/sql_quality_mcp/server.py"]
+      "command": "uv",
+      "args": ["run", "--directory", "PROJECT_DIR", "fastmcp", "run", "server.py"]
     }
   }
 }
@@ -107,7 +104,7 @@ SELECT DISTINCT user_id FROM dwd_xxx_click_di WHERE pt_d = '20260501'
 |---|---|
 | Name | spark-sql-quality |
 | Type | command |
-| Command | `python3 /Users/browncutie/Programme/data_analysis/sql_quality_mcp/server.py` |
+| Command | `uv run --directory PROJECT_DIR fastmcp run server.py` |
 
 ## 当前启用的规则
 
@@ -172,7 +169,7 @@ enabled:
 
 ## 如何关闭某条规则
 
-编辑 `rules.yaml`，注释或删除对应行即可：
+编辑 `rules.yaml`，注释或删除对应行：
 
 ```yaml
 enabled:
@@ -182,6 +179,5 @@ enabled:
 ## 运行测试
 
 ```bash
-pip install pytest
-python3 -m pytest tests/ -v
+uv run pytest tests/ -v
 ```
