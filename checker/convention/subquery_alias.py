@@ -1,3 +1,14 @@
+"""
+规范检查 - 子查询必须有别名
+
+触发关键字: 子查询 (FROM/JOIN 后有嵌套 SELECT)
+核心目标: 所有子查询必须有表别名，且多个子查询别名符合顺序约定（t0, t1, t2...）
+正确写法: FROM (SELECT ...) t0
+
+违规: SELECT * FROM (SELECT user_id FROM t)
+正确: SELECT * FROM (SELECT user_id FROM t) t0
+"""
+
 from __future__ import annotations
 
 from sqlglot import exp

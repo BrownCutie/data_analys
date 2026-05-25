@@ -1,3 +1,16 @@
+"""
+规范检查 - 分区过滤必须存在且下推
+
+触发关键字: 分区过滤 (查 Hive表/明细表, 出现 pt_)
+核心目标: 查询必须有分区过滤（pt_d/pt_h），禁止全表扫描
+         分区条件必须在最内层/最先执行，不要在外层才过滤
+正确写法: WHERE pt_d = '20260101' 或 WHERE pt_d BETWEEN '20260101' AND '20260107'
+
+违规: SELECT user_id FROM dwd_xxx_di
+违规: SELECT * FROM (SELECT user_id FROM dwd_xxx_di) WHERE pt_d = '20260101'
+正确: SELECT user_id FROM dwd_xxx_di WHERE pt_d = '20260101'
+"""
+
 from __future__ import annotations
 
 from sqlglot import exp
@@ -7,7 +20,7 @@ from checker.base import BaseChecker, CheckContext, Violation
 PARTITION_FIELDS = {"pt_d", "pt_h"}
 
 
-class RequirePartitionFilterChecker(BaseChecker):
+class PartitionFilterChecker(BaseChecker):
     rule_id = "SQL-PARTITION-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
@@ -15,7 +28,6 @@ class RequirePartitionFilterChecker(BaseChecker):
         for stmt in ctx.statements:
             if not isinstance(stmt, exp.Select):
                 continue
-            # 收集 WHERE 中引用的所有列名
             columns_in_where = set()
             where = stmt.find(exp.Where)
             if where:

@@ -1,3 +1,14 @@
+"""
+硬性规则 - 消除 COUNT(DISTINCT) 写法
+
+触发关键字: COUNT(DISTINCT ...)
+核心目标: 禁止 COUNT(DISTINCT x)，先用 GROUP BY 去重再用 COUNT(1)
+正确写法: 内层 GROUP BY + 外层 COUNT(1)
+
+违规: SELECT COUNT(DISTINCT user_id) FROM t
+正确: SELECT COUNT(1) FROM (SELECT user_id FROM t GROUP BY user_id) t0
+"""
+
 from __future__ import annotations
 
 from sqlglot import exp

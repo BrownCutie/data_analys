@@ -1,5 +1,5 @@
 from checker.base import CheckContext
-from checker.no_right_join import NoRightJoinChecker
+from checker.hard.no_right_join import NoRightJoinChecker
 import sqlglot
 
 

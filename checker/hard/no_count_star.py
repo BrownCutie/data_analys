@@ -1,3 +1,14 @@
+"""
+硬性规则 - 消除 COUNT(*) 写法
+
+触发关键字: COUNT(*)
+核心目标: 禁止 COUNT(*)，统一使用 COUNT(1)
+正确写法: COUNT(1)
+
+违规: SELECT COUNT(*) FROM t
+正确: SELECT COUNT(1) FROM t
+"""
+
 from __future__ import annotations
 
 from sqlglot import exp

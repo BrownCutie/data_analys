@@ -1,5 +1,5 @@
 from checker.base import CheckContext
-from checker.no_count_star import NoCountStarChecker
+from checker.hard.no_count_star import NoCountStarChecker
 import sqlglot
 
 

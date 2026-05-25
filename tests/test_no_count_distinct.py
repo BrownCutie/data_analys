@@ -1,5 +1,5 @@
 from checker.base import CheckContext
-from checker.no_count_distinct import NoCountDistinctChecker
+from checker.hard.no_count_distinct import NoCountDistinctChecker
 import sqlglot
 
 

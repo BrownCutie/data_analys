@@ -1,5 +1,5 @@
 from checker.base import CheckContext
-from checker.subquery_alias import SubqueryAliasChecker
+from checker.convention.subquery_alias import SubqueryAliasChecker
 import sqlglot
 
 
