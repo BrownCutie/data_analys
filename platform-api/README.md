@@ -32,7 +32,7 @@ platform-api/
 ├── pages/
 │   ├── common.py          # 公共请求函数（api_get / api_post）
 │   ├── page_registry.json # 中文名 → .py 文件映射
-│   ├── table_info.py      # 表字段检查
+│   ├── table_info.py      # 表字段信息
 │   └── sql_execute.py     # SQL 执行
 ```
 
@@ -92,7 +92,7 @@ async def run_quality_check(table_name: str) -> dict:
 
 ```json
 {
-  "表字段检查": { "file": "table_info.py", "description": "查询表的字段信息" },
+  "表字段信息": { "file": "table_info.py", "description": "获取表的字段信息" },
   "SQL执行": { "file": "sql_execute.py", "description": "提交并执行 Spark SQL" },
   "数据质量检查": { "file": "data_quality.py", "description": "数据质量检查与报告" }
 }
@@ -138,14 +138,12 @@ async def run_quality_check(table_name: str) -> dict:
 
 | 工具名 | 说明 |
 |---|---|
-| `table_info_get_table_columns` | [表字段检查] 查询表字段列表 |
-| `table_info_get_table_detail` | [表字段检查] 查询表详细信息 |
-| `table_info_search_tables` | [表字段检查] 按关键字搜索表名 |
+| `table_info_get_table_columns` | [表字段信息] 获取表字段列表 |
+| `table_info_get_table_detail` | [表字段信息] 获取表详细信息 |
+| `table_info_search_tables` | [表字段信息] 按关键字搜索表名 |
 | `sql_execute_submit_sql` | [SQL执行] 提交 SQL 执行任务 |
 | `sql_execute_get_sql_status` | [SQL执行] 查询执行状态 |
 | `sql_execute_get_sql_result` | [SQL执行] 获取执行结果 |
-| `platform_login` | 手动触发登录 |
-| `platform_check_login` | 检查登录状态 |
 
 ## 并发登录保护机制
 

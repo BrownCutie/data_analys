@@ -1,10 +1,10 @@
 """
-二级页面 - 表字段检查
+二级页面 - 表字段信息
 
 页面路径: /#/table-info
 功能列表:
-    1. get_table_columns    - 查询表的字段列表（字段名、类型、注释）
-    2. get_table_detail     - 查询表的详细信息（分区、存储格式、行数）
+    1. get_table_columns    - 获取表的字段列表（字段名、类型、注释）
+    2. get_table_detail     - 获取表的详细信息（分区、存储格式、行数）
     3. search_tables        - 按关键字搜索表名
 
 URL 前缀: {BASE_URL}/api/table-info

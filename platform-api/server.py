@@ -56,7 +56,6 @@ def _register_tools() -> None:
             # 描述前加中文名，让 Agent 能通过中文找到对应工具
             tool_name = f"{module_name}_{name}"
             doc = f"[{cn_name}] {inspect.getdoc(obj) or ''}"
-            doc = inspect.getdoc(obj) or ""
 
             # 动态注册为 MCP Tool
             mcp.tool(name=tool_name, description=doc)(obj)
@@ -65,24 +64,6 @@ def _register_tools() -> None:
 
 
 _register_tools()
-
-
-# ── 登录管理工具 ────────────────────────────────────────────────
-@mcp.tool
-async def platform_login() -> str:
-    """手动触发平台登录。通常不需要调用，系统会自动检查 cookie 有效性。"""
-    from login import login
-    await login()
-    return "登录成功，cookie 已保存"
-
-
-@mcp.tool
-async def platform_check_login() -> str:
-    """检查当前平台登录状态（cookie 是否有效）"""
-    from login import check_login
-    if check_login():
-        return "cookie 有效，登录状态正常"
-    return "cookie 已过期或不存在，需要重新登录"
 
 
 if __name__ == "__main__":
