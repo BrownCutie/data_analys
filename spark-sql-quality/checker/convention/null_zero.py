@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from sqlglot import exp
 
-from checker.base import BaseChecker, CheckContext, Violation
+from ..base import BaseChecker, CheckContext, Violation
 
 
 class NullZeroChecker(BaseChecker):

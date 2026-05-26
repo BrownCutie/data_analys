@@ -4,8 +4,8 @@ import logging
 
 import sqlglot
 
-from checker.base import BaseChecker, CheckContext, Violation
-from checker.registry import RULE_REGISTRY
+from .base import BaseChecker, CheckContext, Violation
+from .registry import RULE_REGISTRY
 from config import load_enabled_rules
 
 logger = logging.getLogger(__name__)
