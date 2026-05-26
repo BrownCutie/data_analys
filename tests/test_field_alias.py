@@ -1,23 +1,34 @@
-from checker.base import CheckContext
-from checker.convention.field_alias import FieldAliasChecker
 import sqlglot
 
+from checker.base import CheckContext
+from checker.hard.aggregate.field_alias import FieldAliasChecker
 
-def ctx(sql: str) -> CheckContext:
-    return CheckContext(raw_sql=sql, statements=sqlglot.parse(sql, read="spark"))
-
-
-def test_no_alias_violation():
-    result = FieldAliasChecker().check(ctx("SELECT COUNT(1) FROM t"))
-    assert len(result) == 1
+_checker = FieldAliasChecker()
 
 
-def test_bad_alias_violation():
-    result = FieldAliasChecker().check(ctx("SELECT COUNT(1) AS cnt FROM t"))
-    assert len(result) == 1
-    assert "无意义" in result[0].message
+def _check(sql: str):
+    statements = sqlglot.parse(sql, read="spark")
+    ctx = CheckContext(raw_sql=sql, statements=[s for s in statements if s is not None])
+    return _checker.check(ctx)
 
 
-def test_good_alias_pass():
-    result = FieldAliasChecker().check(ctx("SELECT COUNT(1) AS click_cnt FROM t"))
-    assert result == []
+def test_pass():
+    violations = _check("SELECT COUNT(1) AS click_cnt FROM t WHERE pt_d = '20260101'")
+    assert len(violations) == 0
+
+
+def test_pass_plain_column():
+    violations = _check("SELECT user_id FROM t WHERE pt_d = '20260101'")
+    assert len(violations) == 0
+
+
+def test_fail_no_alias():
+    violations = _check("SELECT COUNT(1) FROM t WHERE pt_d = '20260101'")
+    assert len(violations) == 1
+    assert "别名" in violations[0].message
+
+
+def test_fail_bad_alias():
+    violations = _check("SELECT COUNT(1) AS cnt FROM t WHERE pt_d = '20260101'")
+    assert len(violations) == 1
+    assert "无意义" in violations[0].message

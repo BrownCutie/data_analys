@@ -1,9 +1,9 @@
 import sqlglot
 
 from checker.base import CheckContext
-from checker.hard.join.no_implicit_join import NoImplicitJoinChecker
+from checker.hard.join.no_cross_join import NoCrossJoinChecker
 
-_checker = NoImplicitJoinChecker()
+_checker = NoCrossJoinChecker()
 
 
 def _check(sql: str):
@@ -14,12 +14,12 @@ def _check(sql: str):
 
 def test_pass():
     violations = _check(
-        "SELECT a.id FROM t1 a JOIN t2 b ON a.id = b.id WHERE a.pt_d = '20260101'"
+        "SELECT a.id FROM t1 a INNER JOIN t2 b ON a.id = b.id WHERE a.pt_d = '20260101'"
     )
     assert len(violations) == 0
 
 
 def test_fail():
-    violations = _check("SELECT a.id FROM t1 a, t2 b WHERE a.id = b.id")
+    violations = _check("SELECT a.id FROM t1 a CROSS JOIN t2 b")
     assert len(violations) == 1
-    assert "隐式" in violations[0].message
+    assert "CROSS JOIN" in violations[0].message

@@ -1,22 +1,29 @@
 from checker.base import CheckContext
-from checker.convention.table_alias import TableAliasChecker
+from checker.convention.alias.table_alias import TableAliasChecker
+
 import sqlglot
 
 
-def ctx(sql: str) -> CheckContext:
-    return CheckContext(raw_sql=sql, statements=sqlglot.parse(sql, read="spark"))
+def _check(sql: str, checker_cls):
+    statements = sqlglot.parse(sql, read="spark")
+    ctx = CheckContext(raw_sql=sql, statements=[s for s in statements if s is not None])
+    return checker_cls().check(ctx)
 
 
-def test_field_no_alias_violation():
-    result = TableAliasChecker().check(ctx("SELECT user_id FROM t0 LEFT JOIN t1 ON t0.id = t1.id"))
-    assert len(result) >= 1
+def test_pass():
+    sql = "SELECT a.user_id FROM t1 a LEFT JOIN t2 b ON a.id = b.id"
+    violations = _check(sql, TableAliasChecker)
+    assert violations == []
 
 
-def test_field_with_alias_pass():
-    result = TableAliasChecker().check(ctx("SELECT t0.user_id FROM t0 LEFT JOIN t1 ON t0.id = t1.id"))
-    assert result == []
+def test_pass_single_table():
+    sql = "SELECT user_id FROM t"
+    violations = _check(sql, TableAliasChecker)
+    assert violations == []
 
 
-def test_single_table_pass():
-    result = TableAliasChecker().check(ctx("SELECT user_id FROM t"))
-    assert result == []
+def test_fail_unqualified():
+    sql = "SELECT user_id FROM t1 a LEFT JOIN t2 b ON a.id = b.id"
+    violations = _check(sql, TableAliasChecker)
+    assert len(violations) == 1
+    assert "user_id" in violations[0].message

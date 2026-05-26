@@ -1,17 +1,24 @@
 from checker.base import CheckContext
-from checker.convention.group_by import GroupByChecker
+from checker.convention.aggregate.group_by import GroupByChecker
+
 import sqlglot
 
 
-def ctx(sql: str) -> CheckContext:
-    return CheckContext(raw_sql=sql, statements=sqlglot.parse(sql, read="spark"))
+def _check(sql: str, checker_cls):
+    statements = sqlglot.parse(sql, read="spark")
+    ctx = CheckContext(raw_sql=sql, statements=[s for s in statements if s is not None])
+    return checker_cls().check(ctx)
 
 
-def test_missing_group_by_col():
-    result = GroupByChecker().check(ctx("SELECT user_id, city, COUNT(1) FROM t GROUP BY user_id"))
-    assert len(result) >= 1
+def test_pass():
+    sql = "SELECT user_id, city, COUNT(1) AS cnt FROM t GROUP BY user_id, city"
+    violations = _check(sql, GroupByChecker)
+    assert violations == []
 
 
-def test_complete_group_by_pass():
-    result = GroupByChecker().check(ctx("SELECT user_id, city, COUNT(1) AS cnt FROM t GROUP BY user_id, city"))
-    assert result == []
+def test_fail():
+    sql = "SELECT user_id, city, COUNT(1) AS cnt FROM t GROUP BY user_id"
+    violations = _check(sql, GroupByChecker)
+    assert len(violations) >= 1
+    messages = " ".join(v.message for v in violations)
+    assert "city" in messages

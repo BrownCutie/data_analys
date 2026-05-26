@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from checker.base import CheckContext
-from checker.convention.alias.subquery_alias import SubqueryAliasChecker
+from checker.hard.cte.no_cte import NoCteChecker
 
 import sqlglot
 
@@ -11,13 +13,16 @@ def _check(sql: str, checker_cls):
 
 
 def test_pass():
-    sql = "SELECT * FROM (SELECT user_id FROM t) t0"
-    violations = _check(sql, SubqueryAliasChecker)
+    violations = _check(
+        "SELECT user_id FROM t WHERE pt_d = '20260101'",
+        NoCteChecker,
+    )
     assert violations == []
 
 
 def test_fail():
-    sql = "SELECT * FROM (SELECT user_id FROM t)"
-    violations = _check(sql, SubqueryAliasChecker)
+    violations = _check(
+        "WITH t0 AS (SELECT user_id FROM user_table) SELECT * FROM t0",
+        NoCteChecker,
+    )
     assert len(violations) == 1
-    assert violations[0].rule_id if hasattr(violations[0], "rule_id") else True

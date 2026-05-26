@@ -1,5 +1,5 @@
 from checker.base import CheckContext
-from checker.convention.alias.subquery_alias import SubqueryAliasChecker
+from checker.convention.format.case_when_else import CaseWhenElseChecker
 
 import sqlglot
 
@@ -11,13 +11,13 @@ def _check(sql: str, checker_cls):
 
 
 def test_pass():
-    sql = "SELECT * FROM (SELECT user_id FROM t) t0"
-    violations = _check(sql, SubqueryAliasChecker)
+    sql = "SELECT CASE WHEN x > 0 THEN 'yes' ELSE 'no' END AS flag FROM t"
+    violations = _check(sql, CaseWhenElseChecker)
     assert violations == []
 
 
 def test_fail():
-    sql = "SELECT * FROM (SELECT user_id FROM t)"
-    violations = _check(sql, SubqueryAliasChecker)
+    sql = "SELECT CASE WHEN x > 0 THEN 'yes' END AS flag FROM t"
+    violations = _check(sql, CaseWhenElseChecker)
     assert len(violations) == 1
-    assert violations[0].rule_id if hasattr(violations[0], "rule_id") else True
+    assert "ELSE" in violations[0].message

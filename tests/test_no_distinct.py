@@ -1,17 +1,29 @@
-from checker.base import CheckContext
-from checker.hard.no_distinct import NoDistinctChecker
 import sqlglot
 
+from checker.base import CheckContext
+from checker.hard.aggregate.no_distinct import NoDistinctChecker
 
-def ctx(sql: str) -> CheckContext:
-    return CheckContext(raw_sql=sql, statements=sqlglot.parse(sql, read="spark"))
-
-
-def test_distinct_violation():
-    result = NoDistinctChecker().check(ctx("SELECT DISTINCT user_id FROM t"))
-    assert len(result) == 1
+_checker = NoDistinctChecker()
 
 
-def test_no_distinct_pass():
-    result = NoDistinctChecker().check(ctx("SELECT user_id FROM t GROUP BY user_id"))
-    assert result == []
+def _check(sql: str):
+    statements = sqlglot.parse(sql, read="spark")
+    ctx = CheckContext(raw_sql=sql, statements=[s for s in statements if s is not None])
+    return _checker.check(ctx)
+
+
+def test_pass():
+    violations = _check("SELECT user_id FROM t GROUP BY user_id")
+    assert len(violations) == 0
+
+
+def test_fail_select_distinct():
+    violations = _check("SELECT DISTINCT user_id FROM t")
+    assert len(violations) == 1
+    assert "DISTINCT" in violations[0].message
+
+
+def test_fail_count_distinct():
+    violations = _check("SELECT COUNT(DISTINCT user_id) FROM t")
+    assert len(violations) == 1
+    assert "DISTINCT" in violations[0].message
