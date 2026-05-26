@@ -25,7 +25,6 @@ ALIAS_REQUIRED_TYPES = (exp.Count, exp.Sum, exp.Avg, exp.Min, exp.Max, exp.Case,
 
 
 class FieldAliasChecker(BaseChecker):
-    rule_id = "SQL-FIELD-ALIAS-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -48,15 +47,13 @@ class FieldAliasChecker(BaseChecker):
                 # 没有别名
                 if not alias:
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="聚合/计算字段必须有 AS 别名",
+                                                message="聚合/计算字段必须有 AS 别名",
                         severity="warning",
                     ))
                 # 别名无意义
                 elif alias.lower() in BAD_ALIASES:
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message=f"别名 '{alias}' 无意义，请使用能表达业务含义的名称",
+                                                message=f"别名 '{alias}' 无意义，请使用能表达业务含义的名称",
                         severity="warning",
                     ))
         return violations

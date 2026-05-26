@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_right_join_violation():
     result = NoRightJoinChecker().check(ctx("SELECT a.id FROM a RIGHT JOIN b ON a.id = b.id"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-JOIN-RIGHT-001"
 
 
 def test_left_join_pass():

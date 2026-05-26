@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_distinct_violation():
     result = NoDistinctChecker().check(ctx("SELECT DISTINCT user_id FROM t"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-DISTINCT-001"
 
 
 def test_no_distinct_pass():

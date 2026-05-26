@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_bad_temp_table_name():
     result = TempTableNamingChecker().check(ctx("CREATE TABLE tmp_abc AS SELECT 1"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-TEMP-TABLE-001"
 
 
 def test_good_temp_table_name():

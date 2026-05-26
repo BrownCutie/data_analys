@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_implicit_join_violation():
     result = NoImplicitJoinChecker().check(ctx("SELECT a.id FROM a, b WHERE a.id = b.id"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-JOIN-IMPLICIT-001"
 
 
 def test_explicit_join_pass():

@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class NoCountStarChecker(BaseChecker):
-    rule_id = "SQL-COUNT-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -25,7 +24,6 @@ class NoCountStarChecker(BaseChecker):
             for node in stmt.walk():
                 if isinstance(node, exp.Count) and isinstance(node.this, exp.Star):
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="禁止使用 COUNT(*)，请改为 COUNT(1)",
+                                                message="禁止使用 COUNT(*)，请改为 COUNT(1)",
                     ))
         return violations

@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_missing_group_by_col():
     result = GroupByChecker().check(ctx("SELECT user_id, city, COUNT(1) FROM t GROUP BY user_id"))
     assert len(result) >= 1
-    assert result[0].rule == "SQL-GROUP-BY-001"
 
 
 def test_complete_group_by_pass():

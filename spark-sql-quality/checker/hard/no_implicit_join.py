@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class NoImplicitJoinChecker(BaseChecker):
-    rule_id = "SQL-JOIN-IMPLICIT-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -28,7 +27,6 @@ class NoImplicitJoinChecker(BaseChecker):
             for node in stmt.find_all(exp.Join):
                 if node.kind == "CROSS" and node.args.get("on") is None and node.args.get("using") is None:
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="禁止隐式 JOIN（FROM a, b），请改为显式 JOIN ... ON",
+                                                message="禁止隐式 JOIN（FROM a, b），请改为显式 JOIN ... ON",
                     ))
         return violations

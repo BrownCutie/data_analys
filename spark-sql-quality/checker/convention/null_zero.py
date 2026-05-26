@@ -19,7 +19,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class NullZeroChecker(BaseChecker):
-    rule_id = "SQL-NULL-ZERO-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -37,8 +36,7 @@ class NullZeroChecker(BaseChecker):
                         parent = parent.parent
                     if not has_coalesce:
                         violations.append(Violation(
-                            rule=self.rule_id,
-                            message="除法运算缺少 NULL 和除零保护，请使用 COALESCE(x / NULLIF(y, 0), 0)",
+                                                        message="除法运算缺少 NULL 和除零保护，请使用 COALESCE(x / NULLIF(y, 0), 0)",
                             severity="warning",
                         ))
         return violations

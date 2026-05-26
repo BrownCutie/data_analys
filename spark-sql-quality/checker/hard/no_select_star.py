@@ -18,7 +18,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class NoSelectStarChecker(BaseChecker):
-    rule_id = "SQL-SELECT-STAR-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -28,13 +27,11 @@ class NoSelectStarChecker(BaseChecker):
             for expression in stmt.expressions:
                 if isinstance(expression, exp.Star):
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="禁止 SELECT *，请明确列出需要的字段",
+                                                message="禁止 SELECT *，请明确列出需要的字段",
                     ))
                 # SELECT t.* 的情况
                 elif isinstance(expression, exp.Column) and isinstance(expression.this, exp.Star):
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="禁止 SELECT t.*，请明确列出需要的字段",
+                                                message="禁止 SELECT t.*，请明确列出需要的字段",
                     ))
         return violations

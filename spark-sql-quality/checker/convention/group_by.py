@@ -18,7 +18,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class GroupByChecker(BaseChecker):
-    rule_id = "SQL-GROUP-BY-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -41,8 +40,7 @@ class GroupByChecker(BaseChecker):
                 for col in expression.find_all(exp.Column):
                     if col.name not in group_cols:
                         violations.append(Violation(
-                            rule=self.rule_id,
-                            message=f"字段 '{col.name}' 在 SELECT 中但不在 GROUP BY 中",
+                                                        message=f"字段 '{col.name}' 在 SELECT 中但不在 GROUP BY 中",
                             severity="warning",
                         ))
         return violations

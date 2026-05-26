@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_no_partition_violation():
     result = PartitionFilterChecker().check(ctx("SELECT user_id FROM t"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-PARTITION-001"
 
 
 def test_partition_ptd_pass():

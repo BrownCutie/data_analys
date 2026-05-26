@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class JoinFilterFirstChecker(BaseChecker):
-    rule_id = "SQL-JOIN-FILTER-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -38,8 +37,7 @@ class JoinFilterFirstChecker(BaseChecker):
             # 如果外层 WHERE 有分区过滤，说明过滤没有下推到子查询
             if partition_cols_in_where:
                 violations.append(Violation(
-                    rule=self.rule_id,
-                    message="分区过滤条件未下推，建议将分区过滤移到 JOIN 前的子查询中",
+                                        message="分区过滤条件未下推，建议将分区过滤移到 JOIN 前的子查询中",
                     severity="warning",
                 ))
         return violations

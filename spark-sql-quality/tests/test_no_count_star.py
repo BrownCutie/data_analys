@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_count_star_violation():
     result = NoCountStarChecker().check(ctx("SELECT COUNT(*) FROM t"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-COUNT-001"
 
 
 def test_count_one_pass():

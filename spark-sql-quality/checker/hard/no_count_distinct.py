@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class NoCountDistinctChecker(BaseChecker):
-    rule_id = "SQL-COUNT-DISTINCT-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -25,7 +24,6 @@ class NoCountDistinctChecker(BaseChecker):
             for node in stmt.walk():
                 if isinstance(node, exp.Count) and isinstance(node.this, exp.Distinct):
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="禁止使用 COUNT(DISTINCT ...)，请改为内层 GROUP BY 去重 + 外层 COUNT(1)",
+                                                message="禁止使用 COUNT(DISTINCT ...)，请改为内层 GROUP BY 去重 + 外层 COUNT(1)",
                     ))
         return violations

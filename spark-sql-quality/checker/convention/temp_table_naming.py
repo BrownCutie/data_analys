@@ -25,7 +25,6 @@ TEMP_TABLE_PATTERN = re.compile(r"^tmp_[a-z][a-z0-9]*_[a-z][a-z0-9]*(?:_\d{8})?$
 
 
 class TempTableNamingChecker(BaseChecker):
-    rule_id = "SQL-TEMP-TABLE-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -37,8 +36,7 @@ class TempTableNamingChecker(BaseChecker):
                     if table and table.name.startswith("tmp_"):
                         if not TEMP_TABLE_PATTERN.match(table.name):
                             violations.append(Violation(
-                                rule=self.rule_id,
-                                message=f"临时表 '{table.name}' 命名不规范，推荐格式: tmp_{{业务域}}_{{描述}}_{{日期}}",
+                                                                message=f"临时表 '{table.name}' 命名不规范，推荐格式: tmp_{{业务域}}_{{描述}}_{{日期}}",
                                 severity="warning",
                             ))
                 # INSERT INTO 语句
@@ -47,8 +45,7 @@ class TempTableNamingChecker(BaseChecker):
                     if table and table.name.startswith("tmp_"):
                         if not TEMP_TABLE_PATTERN.match(table.name):
                             violations.append(Violation(
-                                rule=self.rule_id,
-                                message=f"临时表 '{table.name}' 命名不规范，推荐格式: tmp_{{业务域}}_{{描述}}_{{日期}}",
+                                                                message=f"临时表 '{table.name}' 命名不规范，推荐格式: tmp_{{业务域}}_{{描述}}_{{日期}}",
                                 severity="warning",
                             ))
         return violations

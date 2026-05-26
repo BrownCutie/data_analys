@@ -17,7 +17,6 @@ class RuleRunner:
         unregistered = [r for r in self.enabled_ids if r not in RULE_REGISTRY]
         if unregistered:
             raise RuntimeError(f"未注册的规则: {unregistered}")
-        self.checkers: list[BaseChecker] = [RULE_REGISTRY[rid]() for rid in self.enabled_ids]
 
     def run(self, sql: str) -> dict:
         # 1. parse
@@ -28,15 +27,14 @@ class RuleRunner:
 
         # 2. check
         ctx = CheckContext(raw_sql=sql, statements=statements)
-        violations: list[Violation] = []
-        for checker in self.checkers:
+        results: list[dict] = []
+        for rule_id in self.enabled_ids:
+            checker = RULE_REGISTRY[rule_id]()
             try:
-                violations.extend(checker.check(ctx))
+                for v in checker.check(ctx):
+                    results.append({"rule": rule_id, "message": v.message, "severity": v.severity})
             except Exception:
-                logger.exception("Checker %s 执行异常", checker.rule_id)
+                logger.exception("Checker %s 执行异常", rule_id)
 
         # 3. result
-        return {
-            "passed": len(violations) == 0,
-            "violations": [{"rule": v.rule, "message": v.message, "severity": v.severity} for v in violations],
-        }
+        return {"passed": len(results) == 0, "violations": results}

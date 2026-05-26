@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_no_alias_violation():
     result = FieldAliasChecker().check(ctx("SELECT COUNT(1) FROM t"))
     assert len(result) == 1
-    assert result[0].rule == "SQL-FIELD-ALIAS-001"
 
 
 def test_bad_alias_violation():

@@ -21,7 +21,6 @@ PARTITION_FIELDS = {"pt_d", "pt_h"}
 
 
 class PartitionFilterChecker(BaseChecker):
-    rule_id = "SQL-PARTITION-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -35,7 +34,6 @@ class PartitionFilterChecker(BaseChecker):
                     columns_in_where.add(col.name)
             if not columns_in_where.intersection(PARTITION_FIELDS):
                 violations.append(Violation(
-                    rule=self.rule_id,
-                    message="查询缺少分区过滤，WHERE 中必须包含 pt_d 或 pt_h 条件",
+                                        message="查询缺少分区过滤，WHERE 中必须包含 pt_d 或 pt_h 条件",
                 ))
         return violations

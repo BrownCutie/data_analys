@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Violation:
-    rule: str
     message: str
     severity: str = "error"
 
@@ -18,8 +17,6 @@ class CheckContext:
 
 
 class BaseChecker(ABC):
-    rule_id: str = ""
-
     @abstractmethod
     def check(self, ctx: CheckContext) -> list[Violation]:
         ...

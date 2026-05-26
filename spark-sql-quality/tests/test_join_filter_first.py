@@ -11,7 +11,6 @@ def test_filter_not_pushed():
     sql = "SELECT a.id FROM big_table a JOIN detail_table b ON a.id = b.id WHERE a.pt_d = '20260101'"
     result = JoinFilterFirstChecker().check(ctx(sql))
     assert len(result) == 1
-    assert result[0].rule == "SQL-JOIN-FILTER-001"
 
 
 def test_no_join_pass():

@@ -10,7 +10,6 @@ def ctx(sql: str) -> CheckContext:
 def test_field_no_alias_violation():
     result = TableAliasChecker().check(ctx("SELECT user_id FROM t0 LEFT JOIN t1 ON t0.id = t1.id"))
     assert len(result) >= 1
-    assert result[0].rule == "SQL-TABLE-ALIAS-001"
 
 
 def test_field_with_alias_pass():

@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class NoRightJoinChecker(BaseChecker):
-    rule_id = "SQL-JOIN-RIGHT-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -25,7 +24,6 @@ class NoRightJoinChecker(BaseChecker):
             for node in stmt.walk():
                 if isinstance(node, exp.Join) and node.side == "RIGHT":
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="禁止使用 RIGHT JOIN，请调整表顺序改为 LEFT JOIN",
+                                                message="禁止使用 RIGHT JOIN，请调整表顺序改为 LEFT JOIN",
                     ))
         return violations

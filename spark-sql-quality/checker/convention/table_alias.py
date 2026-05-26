@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class TableAliasChecker(BaseChecker):
-    rule_id = "SQL-TABLE-ALIAS-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -32,8 +31,7 @@ class TableAliasChecker(BaseChecker):
             for col in stmt.find_all(exp.Column):
                 if not col.table:
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message=f"多表查询时字段 '{col.name}' 必须带表别名",
+                                                message=f"多表查询时字段 '{col.name}' 必须带表别名",
                         severity="warning",
                     ))
         return violations

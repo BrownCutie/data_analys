@@ -17,7 +17,6 @@ from ..base import BaseChecker, CheckContext, Violation
 
 
 class SubqueryAliasChecker(BaseChecker):
-    rule_id = "SQL-SUBQUERY-ALIAS-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
@@ -25,7 +24,6 @@ class SubqueryAliasChecker(BaseChecker):
             for node in stmt.walk():
                 if isinstance(node, exp.Subquery) and not node.alias:
                     violations.append(Violation(
-                        rule=self.rule_id,
-                        message="子查询必须有别名，例如 FROM (SELECT ...) t0",
+                                                message="子查询必须有别名，例如 FROM (SELECT ...) t0",
                     ))
         return violations
