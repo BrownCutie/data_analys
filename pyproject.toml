@@ -1,0 +1,16 @@
+[project]
+name = "platform-api-mcp"
+version = "0.1.0"
+description = "平台 API 调用 MCP 服务"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp",
+    "httpx",
+    "playwright",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
