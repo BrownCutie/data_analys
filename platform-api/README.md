@@ -57,7 +57,7 @@ URL 前缀: {BASE_URL}/api/data-quality
 from __future__ import annotations
 
 from login import require_login
-from pages.common import BASE_URL, api_get, api_post
+from .common import BASE_URL, api_get, api_post
 
 URL_PREFIX = f"{BASE_URL}/api/data-quality"
 

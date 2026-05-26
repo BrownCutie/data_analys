@@ -1,7 +1,7 @@
 """
 二级页面 API 的公共工具函数
 
-每个页面文件通过 from pages.common import api_get, api_post 来发送请求，
+每个页面文件通过 from .common import api_get, api_post 来发送请求，
 自动带上 cookie 和 JSON headers。
 """
 
