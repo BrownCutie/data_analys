@@ -21,7 +21,6 @@ cd data_analys/spark-sql-quality
 ## 快速验证
 
 ```bash
-# 测试一下
 uv run python3 -c "
 from checker.runner import RuleRunner
 import json
@@ -106,37 +105,63 @@ opencode mcp add
 | Type | command |
 | Command | `uv run --directory PROJECT_DIR fastmcp run server.py` |
 
+## 项目结构
+
+```
+server.py              # MCP 入口，注册 check_sql_compliance 工具
+config.py              # 加载 rules.yaml（黑名单机制）
+rules.yaml             # 禁用规则列表，默认全部执行
+checker/
+├── base.py            # BaseChecker, CheckContext, Violation
+├── registry.py        # 自动扫描 hard/convention 下所有 .py，按 rule_id 注册
+├── runner.py          # 过滤黑名单 → 解析 SQL → 依次执行 checker → 汇总结果
+├── hard/              # 硬性违规（命中即禁止）
+│   ├── no_count_distinct.py
+│   ├── no_count_star.py
+│   ├── no_distinct.py
+│   ├── no_implicit_join.py
+│   ├── no_right_join.py
+│   └── no_select_star.py
+└── convention/        # 规范检查（必须符合约定）
+    ├── field_alias.py
+    ├── group_by.py
+    ├── join_filter_first.py
+    ├── null_zero.py
+    ├── partition_filter.py
+    ├── subquery_alias.py
+    ├── table_alias.py
+    └── temp_table_naming.py
+```
+
 ## 当前启用的规则
 
-### 一、硬性违规项（命中即禁止，必须修复）
+### 硬性违规项（命中即禁止，必须修复）
 
 | 规则 ID | 触发关键字 | 文件 | 核心目标 |
 |---|---|---|---|
-| SQL-DISTINCT-001 | DISTINCT, COUNT(DISTINCT) | `checker/hard/no_distinct.py` | 消除 DISTINCT 写法 |
-| SQL-COUNT-001 | COUNT(*) | `checker/hard/no_count_star.py` | 消除 COUNT(*) 写法 |
-| SQL-COUNT-DISTINCT-001 | COUNT(DISTINCT ...) | `checker/hard/no_count_distinct.py` | 消除 COUNT(DISTINCT) 写法 |
-| SQL-JOIN-RIGHT-001 | RIGHT JOIN | `checker/hard/no_right_join.py` | 消除 RIGHT JOIN |
-| SQL-JOIN-IMPLICIT-001 | FROM a, b WHERE a.id=b.id | `checker/hard/no_implicit_join.py` | 改为显式 JOIN ... ON |
-| SQL-SELECT-STAR-001 | SELECT * | `checker/hard/no_select_star.py` | 改为显式字段 |
+| SQL-DISTINCT-001 | DISTINCT, COUNT(DISTINCT) | `no_distinct.py` | 消除 DISTINCT 写法 |
+| SQL-COUNT-001 | COUNT(*) | `no_count_star.py` | 消除 COUNT(*) 写法 |
+| SQL-COUNT-DISTINCT-001 | COUNT(DISTINCT ...) | `no_count_distinct.py` | 消除 COUNT(DISTINCT) 写法 |
+| SQL-JOIN-RIGHT-001 | RIGHT JOIN | `no_right_join.py` | 消除 RIGHT JOIN |
+| SQL-JOIN-IMPLICIT-001 | FROM a, b WHERE a.id=b.id | `no_implicit_join.py` | 改为显式 JOIN ... ON |
+| SQL-SELECT-STAR-001 | SELECT * | `no_select_star.py` | 改为显式字段 |
 
-### 二、规范检查项（必须检查是否符合约定）
+### 规范检查项（必须符合约定）
 
 | 规则 ID | 触发关键字 | 文件 | 核心目标 |
 |---|---|---|---|
-| SQL-TABLE-ALIAS-001 | 多表/JOIN/子查询 | `checker/convention/table_alias.py` | 所有表必须有别名，字段引用必须带别名 |
-| SQL-SUBQUERY-ALIAS-001 | FROM/JOIN 后有嵌套 SELECT | `checker/convention/subquery_alias.py` | 子查询必须有别名，符合 t0, t1... 顺序约定 |
-| SQL-FIELD-ALIAS-001 | 聚合/CASE WHEN/计算字段 | `checker/convention/field_alias.py` | 须有清晰别名，禁用 cnt/num1/aaa 等无意义词 |
-| SQL-TEMP-TABLE-001 | CREATE/INSERT 含 tmp_ | `checker/convention/temp_table_naming.py` | 推荐格式: tmp\_{业务域}\_{描述}\_{日期} |
-| SQL-PARTITION-001 | 查询 Hive 表/明细表 | `checker/convention/partition_filter.py` | 必须有分区过滤(pt_d/pt_h)，条件需下推 |
-| SQL-JOIN-FILTER-001 | JOIN 大表/明细表 | `checker/convention/join_filter_first.py` | 必须先过滤后关联，条件下推至子查询 |
-| SQL-GROUP-BY-001 | 出现聚合函数 | `checker/convention/group_by.py` | 非聚合字段须全在 GROUP BY 中 |
-| SQL-NULL-ZERO-001 | 除法/比率/金额计算 | `checker/convention/null_zero.py` | 必须用 COALESCE(x/NULLIF(y,0),0) 做 NULL 和除零保护 |
+| SQL-TABLE-ALIAS-001 | 多表/JOIN/子查询 | `table_alias.py` | 所有表必须有别名，字段引用必须带别名 |
+| SQL-SUBQUERY-ALIAS-001 | FROM/JOIN 后有嵌套 SELECT | `subquery_alias.py` | 子查询必须有别名 |
+| SQL-FIELD-ALIAS-001 | 聚合/CASE WHEN/计算字段 | `field_alias.py` | 须有清晰别名，禁用 cnt/num1/aaa 等无意义词 |
+| SQL-TEMP-TABLE-001 | CREATE/INSERT 含 tmp_ | `temp_table_naming.py` | 推荐格式: tmp\_{业务域}\_{描述}\_{日期} |
+| SQL-PARTITION-001 | 查询 Hive 表/明细表 | `partition_filter.py` | 必须有分区过滤(pt_d/pt_h)，条件需下推 |
+| SQL-JOIN-FILTER-001 | JOIN 大表/明细表 | `join_filter_first.py` | 必须先过滤后关联，条件下推至子查询 |
+| SQL-GROUP-BY-001 | 出现聚合函数 | `group_by.py` | 非聚合字段须全在 GROUP BY 中 |
+| SQL-NULL-ZERO-001 | 除法/比率/金额计算 | `null_zero.py` | 必须用 COALESCE(x/NULLIF(y,0),0) 做 NULL 和除零保护 |
 
-## 如何新增一条检查规则
+## 如何新增规则
 
-### 第 1 步：写 Checker
-
-在 `checker/hard/`（硬性规则）或 `checker/convention/`（规范检查）下新建文件：
+只需 **一步**：在 `checker/hard/` 或 `checker/convention/` 下新建 `.py` 文件，继承 `BaseChecker` 即可自动生效。
 
 ```python
 """
@@ -144,12 +169,11 @@ opencode mcp add
 
 触发关键字: SELECT *
 核心目标: 必须显式列出字段，不允许 SELECT *
-正确写法: 明确写出所有需要的字段名
-
-违规: SELECT * FROM t
-正确: SELECT t.user_id, t.order_id FROM t
+违规示例: SELECT * FROM t
+正确写法: SELECT t.user_id, t.order_id FROM t
 """
 from sqlglot import exp
+
 from checker.base import BaseChecker, CheckContext, Violation
 
 
@@ -157,39 +181,27 @@ class NoSelectStarChecker(BaseChecker):
     rule_id = "SQL-SELECT-STAR-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
-        ...
+        violations = []
+        for stmt in ctx.statements:
+            for select in stmt.find_all(exp.Select):
+                for expr in select.expressions:
+                    if isinstance(expr, exp.Star):
+                        violations.append(
+                            Violation(message="禁止使用 SELECT *，请显式列出字段")
+                        )
+        return violations
 ```
 
-### 第 2 步：注册并启用
+不用改 registry、不用改 yaml，新增的 `.py` 文件会被自动扫描注册。
 
-在 `checker/registry.py` 中添加：
+## 如何关闭规则
 
-```python
-from checker.hard.no_select_star import NoSelectStarChecker
-
-RULE_REGISTRY = {
-    # ... 已有规则
-    "SQL-SELECT-STAR-001": NoSelectStarChecker,
-}
-```
-
-在 `rules.yaml` 中添加：
+编辑 `rules.yaml`，在 `disabled` 列表中添加 `rule_id`：
 
 ```yaml
-enabled:
-  # ... 已有规则
-  - SQL-SELECT-STAR-001
-```
-
-完成。不需要改 MCP Tool 或任何其他文件。
-
-## 如何关闭某条规则
-
-编辑 `rules.yaml`，注释或删除对应行：
-
-```yaml
-enabled:
-  # - SQL-FIELD-ALIAS-001  # 暂时关闭字段别名检查
+disabled:
+  - SQL-FIELD-ALIAS-001    # 暂时关闭字段别名检查
+  # - SQL-TEMP-TABLE-001   # 注释掉即恢复执行
 ```
 
 ## 运行测试
