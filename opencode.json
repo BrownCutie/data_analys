@@ -1,0 +1,12 @@
+{
+  "mcp": {
+    "spark-sql-quality": {
+      "type": "local",
+      "command": ["uv", "run", "--directory", "/Users/browncutie/Programme/data_analysis/spark-sql-quality", "fastmcp", "run", "server.py"]
+    },
+    "platform-api": {
+      "type": "local",
+      "command": ["uv", "run", "--directory", "/Users/browncutie/Programme/data_analysis/platform-api", "fastmcp", "run", "server.py"]
+    }
+  }
+}
