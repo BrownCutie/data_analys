@@ -37,9 +37,6 @@ def _register_tools() -> None:
             print(f"[WARN] 无法加载页面模块 pages.{module_name}: {e}")
             continue
 
-        # 获取模块文档字符串作为描述
-        module_doc = (inspect.getdoc(module) or info.get("description", "")).split("\n")[0]
-
         for name, obj in inspect.getmembers(module, inspect.iscoroutinefunction):
             if name.startswith("_"):
                 continue
