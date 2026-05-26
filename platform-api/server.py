@@ -14,8 +14,6 @@ from pathlib import Path
 
 from fastmcp import FastMCP
 
-from pages.login import ensure_login
-
 mcp = FastMCP("platform-api-mcp")
 
 PAGES_DIR = Path(__file__).parent / "pages"
