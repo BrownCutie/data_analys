@@ -1,40 +1,44 @@
+"""
+自动扫描 registry — 递归扫描 checker/hard 和 checker/convention 下所有 .py 文件，
+找到 BaseChecker 子类，用它们的 rule_id 构建映射。
+新增规则只需写 .py 文件，不用改这个文件。
+"""
+
 from __future__ import annotations
 
-from .base import BaseChecker
+import importlib
+import inspect
+from pathlib import Path
 
-# ── 硬性规则：命中即禁止，必须修复 ──────────────────────────────
-from .hard.no_count_distinct import NoCountDistinctChecker
-from .hard.no_count_star import NoCountStarChecker
-from .hard.no_distinct import NoDistinctChecker
-from .hard.no_implicit_join import NoImplicitJoinChecker
-from .hard.no_right_join import NoRightJoinChecker
-from .hard.no_select_star import NoSelectStarChecker
+from checker.base import BaseChecker
 
-# ── 规范检查：必须符合约定 ────────────────────────────────────
-from .convention.field_alias import FieldAliasChecker
-from .convention.group_by import GroupByChecker
-from .convention.join_filter_first import JoinFilterFirstChecker
-from .convention.null_zero import NullZeroChecker
-from .convention.partition_filter import PartitionFilterChecker
-from .convention.subquery_alias import SubqueryAliasChecker
-from .convention.table_alias import TableAliasChecker
-from .convention.temp_table_naming import TempTableNamingChecker
+_CHECKER_ROOT = Path(__file__).parent
 
-RULE_REGISTRY: dict[str, type[BaseChecker]] = {
-    # ── 硬性规则 ──
-    "SQL-DISTINCT-001": NoDistinctChecker,
-    "SQL-COUNT-001": NoCountStarChecker,
-    "SQL-COUNT-DISTINCT-001": NoCountDistinctChecker,
-    "SQL-JOIN-RIGHT-001": NoRightJoinChecker,
-    "SQL-JOIN-IMPLICIT-001": NoImplicitJoinChecker,
-    "SQL-SELECT-STAR-001": NoSelectStarChecker,
-    # ── 规范检查 ──
-    "SQL-TABLE-ALIAS-001": TableAliasChecker,
-    "SQL-SUBQUERY-ALIAS-001": SubqueryAliasChecker,
-    "SQL-FIELD-ALIAS-001": FieldAliasChecker,
-    "SQL-TEMP-TABLE-001": TempTableNamingChecker,
-    "SQL-PARTITION-001": PartitionFilterChecker,
-    "SQL-JOIN-FILTER-001": JoinFilterFirstChecker,
-    "SQL-GROUP-BY-001": GroupByChecker,
-    "SQL-NULL-ZERO-001": NullZeroChecker,
-}
+
+def _discover_checkers() -> dict[str, type[BaseChecker]]:
+    """递归扫描 hard/ 和 convention/ 下所有 .py，找到 BaseChecker 子类"""
+    registry: dict[str, type[BaseChecker]] = {}
+    for subdir in ("hard", "convention"):
+        search_dir = _CHECKER_ROOT / subdir
+        if not search_dir.exists():
+            continue
+        for py_file in sorted(search_dir.rglob("*.py")):
+            if py_file.name.startswith("_"):
+                continue
+            # checker/hard/count/no_count.py → checker.hard.count.no_count
+            rel_path = py_file.relative_to(_CHECKER_ROOT.parent)
+            module_name = str(rel_path.with_suffix("")).replace("/", ".")
+            try:
+                module = importlib.import_module(module_name)
+            except ImportError:
+                continue
+            for _name, obj in inspect.getmembers(module, inspect.isclass):
+                if issubclass(obj, BaseChecker) and obj is not BaseChecker:
+                    rule_id = getattr(obj, "rule_id", None)
+                    if rule_id:
+                        registry[rule_id] = obj
+    return registry
+
+
+# 启动时自动构建
+RULE_REGISTRY: dict[str, type[BaseChecker]] = _discover_checkers()

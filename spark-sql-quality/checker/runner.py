@@ -4,19 +4,17 @@ import logging
 
 import sqlglot
 
-from .base import BaseChecker, CheckContext, Violation
-from .registry import RULE_REGISTRY
-from config import load_enabled_rules
+from checker.base import CheckContext, Violation
+from checker.registry import RULE_REGISTRY
+from config import load_disabled_rules
 
 logger = logging.getLogger(__name__)
 
 
 class RuleRunner:
     def __init__(self) -> None:
-        self.enabled_ids = load_enabled_rules()
-        unregistered = [r for r in self.enabled_ids if r not in RULE_REGISTRY]
-        if unregistered:
-            raise RuntimeError(f"未注册的规则: {unregistered}")
+        disabled = load_disabled_rules()
+        self.checker_ids = [rid for rid in RULE_REGISTRY if rid not in disabled]
 
     def run(self, sql: str) -> dict:
         # 1. parse
@@ -28,7 +26,7 @@ class RuleRunner:
         # 2. check
         ctx = CheckContext(raw_sql=sql, statements=statements)
         results: list[dict] = []
-        for rule_id in self.enabled_ids:
+        for rule_id in self.checker_ids:
             checker = RULE_REGISTRY[rule_id]()
             try:
                 for v in checker.check(ctx):

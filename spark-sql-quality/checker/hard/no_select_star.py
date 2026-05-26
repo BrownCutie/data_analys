@@ -14,10 +14,13 @@ from __future__ import annotations
 
 from sqlglot import exp
 
-from ..base import BaseChecker, CheckContext, Violation
+from checker.base import BaseChecker, CheckContext, Violation
 
 
 class NoSelectStarChecker(BaseChecker):
+
+    rule_id = "SQL-SELECT-STAR-001"
+
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []

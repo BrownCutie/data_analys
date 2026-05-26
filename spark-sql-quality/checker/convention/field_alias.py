@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from sqlglot import exp
 
-from ..base import BaseChecker, CheckContext, Violation
+from checker.base import BaseChecker, CheckContext, Violation
 
 # 禁止使用的无意义别名
 BAD_ALIASES = {"cnt", "num", "num1", "aaa", "col", "col1", "tmp", "temp", "a", "b", "c", "x", "y", "z"}
@@ -25,6 +25,9 @@ ALIAS_REQUIRED_TYPES = (exp.Count, exp.Sum, exp.Avg, exp.Min, exp.Max, exp.Case,
 
 
 class FieldAliasChecker(BaseChecker):
+
+    rule_id = "SQL-FIELD-ALIAS-001"
+
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []

@@ -15,10 +15,13 @@ from __future__ import annotations
 
 from sqlglot import exp
 
-from ..base import BaseChecker, CheckContext, Violation
+from checker.base import BaseChecker, CheckContext, Violation
 
 
 class NoDistinctChecker(BaseChecker):
+
+    rule_id = "SQL-DISTINCT-001"
+
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []

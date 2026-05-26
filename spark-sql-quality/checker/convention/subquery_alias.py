@@ -13,10 +13,13 @@ from __future__ import annotations
 
 from sqlglot import exp
 
-from ..base import BaseChecker, CheckContext, Violation
+from checker.base import BaseChecker, CheckContext, Violation
 
 
 class SubqueryAliasChecker(BaseChecker):
+
+    rule_id = "SQL-SUBQUERY-ALIAS-001"
+
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []

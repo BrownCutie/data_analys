@@ -19,7 +19,8 @@
       "Bash(sh)",
       "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
       "Bash(uv run:*)",
-      "Bash(uv sync:*)"
+      "Bash(uv sync:*)",
+      "Bash(python3:*)"
     ]
   }
 }

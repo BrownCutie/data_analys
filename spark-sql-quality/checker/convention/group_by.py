@@ -14,10 +14,13 @@ from __future__ import annotations
 
 from sqlglot import exp
 
-from ..base import BaseChecker, CheckContext, Violation
+from checker.base import BaseChecker, CheckContext, Violation
 
 
 class GroupByChecker(BaseChecker):
+
+    rule_id = "SQL-GROUP-BY-001"
+
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []

@@ -17,7 +17,7 @@ import re
 
 from sqlglot import exp
 
-from ..base import BaseChecker, CheckContext, Violation
+from checker.base import BaseChecker, CheckContext, Violation
 
 # 临时表命名规范: tmp_{业务域}_{描述}_{可选日期}
 # 至少需要 tmp_ + 两个下划线分隔的词
@@ -25,6 +25,9 @@ TEMP_TABLE_PATTERN = re.compile(r"^tmp_[a-z][a-z0-9]*_[a-z][a-z0-9]*(?:_\d{8})?$
 
 
 class TempTableNamingChecker(BaseChecker):
+
+    rule_id = "SQL-TEMP-TABLE-001"
+
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
