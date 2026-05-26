@@ -7,9 +7,17 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# 确保 login.py（在父目录）可被导入
+_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 import httpx
 
-from login import get_cookie_header
+from login import get_cookie_header, require_login  # noqa: E402
 
 BASE_URL = "https://your-platform.com"  # TODO: 替换为平台根地址
 
