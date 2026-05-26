@@ -14,7 +14,7 @@ uv run playwright install chromium
 
 编辑以下文件中的 TODO 项：
 
-1. **`login.py`** — 填写登录页面 URL、用户名密码选择器
+1. **`pages/login.py`** — 填写登录页面 URL、用户名密码选择器
 2. **`pages/common.py`** — 填写平台根地址 `BASE_URL`
 
 ## 快速验证
@@ -28,9 +28,9 @@ uv run fastmcp run server.py
 ```
 platform-api/
 ├── server.py              # MCP 入口，自动发现注册所有页面 API
-├── login.py               # 登录管理（check_login / login / require_login 装饰器）
 ├── pages/
-│   ├── common.py          # 公共请求函数（api_get / api_post）
+│   ├── login.py           # 登录管理（cookie 检查 / Playwright 登录 / 并发锁）
+│   ├── common.py          # 公共请求函数（api_get / api_post），自动带 cookie + 登录检查
 │   ├── page_registry.json # 中文名 → .py 文件映射
 │   ├── table_info.py      # 表字段信息
 │   └── sql_execute.py     # SQL 执行

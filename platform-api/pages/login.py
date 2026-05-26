@@ -24,7 +24,7 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 
-COOKIE_FILE = Path(__file__).parent / "cookie.json"
+COOKIE_FILE = Path(__file__).resolve().parent.parent / "cookie.json"
 COOKIE_MAX_AGE = 24 * 3600  # 24 小时，单位秒
 
 # ── 全局登录锁，防止并发重复登录 ──────────────────────────────────

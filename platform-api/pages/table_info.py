@@ -12,13 +12,12 @@ URL 前缀: {BASE_URL}/api/table-info
 
 from __future__ import annotations
 
-from .common import require_login, BASE_URL, api_get, api_post
+from .common import BASE_URL, api_get, api_post
 
 # ── 本页面的 URL 前缀 ──────────────────────────────────────────
 URL_PREFIX = f"{BASE_URL}/api/table-info"
 
 
-@require_login
 async def get_table_columns(database: str, table_name: str) -> dict:
     """
     查询表的字段列表
@@ -33,7 +32,6 @@ async def get_table_columns(database: str, table_name: str) -> dict:
     return await api_get(url, params={"database": database, "tableName": table_name})
 
 
-@require_login
 async def get_table_detail(database: str, table_name: str) -> dict:
     """
     查询表的详细信息（分区、存储格式、行数等）
@@ -48,7 +46,6 @@ async def get_table_detail(database: str, table_name: str) -> dict:
     return await api_get(url, params={"database": database, "tableName": table_name})
 
 
-@require_login
 async def search_tables(keyword: str) -> dict:
     """
     按关键字搜索表名

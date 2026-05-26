@@ -12,13 +12,12 @@ URL 前缀: {BASE_URL}/api/sql-execute
 
 from __future__ import annotations
 
-from .common import require_login, BASE_URL, api_get, api_post
+from .common import BASE_URL, api_get, api_post
 
 # ── 本页面的 URL 前缀 ──────────────────────────────────────────
 URL_PREFIX = f"{BASE_URL}/api/sql-execute"
 
 
-@require_login
 async def submit_sql(sql: str, database: str = "default") -> dict:
     """
     提交 SQL 执行任务
@@ -33,7 +32,6 @@ async def submit_sql(sql: str, database: str = "default") -> dict:
     return await api_post(url, data={"sql": sql, "database": database})
 
 
-@require_login
 async def get_sql_status(task_id: str) -> dict:
     """
     查询 SQL 执行状态
@@ -47,7 +45,6 @@ async def get_sql_status(task_id: str) -> dict:
     return await api_get(url, params={"taskId": task_id})
 
 
-@require_login
 async def get_sql_result(task_id: str) -> dict:
     """
     获取 SQL 执行结果

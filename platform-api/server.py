@@ -14,7 +14,7 @@ from pathlib import Path
 
 from fastmcp import FastMCP
 
-from login import ensure_login
+from pages.login import ensure_login
 
 mcp = FastMCP("platform-api-mcp")
 

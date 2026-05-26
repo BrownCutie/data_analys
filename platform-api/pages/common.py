@@ -1,23 +1,15 @@
 """
 二级页面 API 的公共工具函数
 
-每个页面文件通过 from .common import api_get, api_post 来发送请求，
-自动带上 cookie 和 JSON headers。
+所有请求自动带 cookie，自动检查登录状态。
+页面文件只需: from .common import BASE_URL, api_get, api_post
 """
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-# 确保 login.py（在父目录）可被导入
-_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)
-
 import httpx
 
-from login import get_cookie_header, require_login  # noqa: E402
+from .login import require_login, get_cookie_header
 
 BASE_URL = "https://your-platform.com"  # TODO: 替换为平台根地址
 
@@ -30,16 +22,18 @@ def _headers() -> dict:
     return {**HEADERS, "Cookie": get_cookie_header()}
 
 
+@require_login
 async def api_get(url: str, params: dict | None = None) -> dict:
-    """发送 GET 请求，自动带 cookie"""
+    """发送 GET 请求，自动带 cookie，自动检查登录"""
     async with httpx.AsyncClient() as client:
         resp = await client.get(url, headers=_headers(), params=params)
         resp.raise_for_status()
         return resp.json()
 
 
+@require_login
 async def api_post(url: str, data: dict | None = None) -> dict:
-    """发送 POST 请求，自动带 cookie"""
+    """发送 POST 请求，自动带 cookie，自动检查登录"""
     async with httpx.AsyncClient() as client:
         resp = await client.post(url, headers=_headers(), json=data)
         resp.raise_for_status()
