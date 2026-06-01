@@ -43,8 +43,8 @@ print(json.dumps(result, ensure_ascii=False, indent=2))
     },
     {
       "rule": "SQL-PARTITION-001",
-      "message": "查询缺少分区过滤，WHERE 中必须包含 pt_d 或 pt_h 条件",
-      "severity": "error"
+      "message": "查询缺少分区过滤，WHERE 中必须包含 pt_d / pt_h / pt_m / pt_w 条件",
+      "severity": "warning"
     }
   ]
 }
@@ -116,79 +116,99 @@ checker/
 ├── registry.py        # 自动扫描 hard/convention 下所有 .py，按 rule_id 注册
 ├── runner.py          # 过滤黑名单 → 解析 SQL → 依次执行 checker → 汇总结果
 ├── hard/              # 硬性违规（命中即禁止）
-│   ├── no_count_distinct.py
-│   ├── no_count_star.py
-│   ├── no_distinct.py
-│   ├── no_implicit_join.py
-│   ├── no_right_join.py
-│   └── no_select_star.py
+│   ├── aggregate/
+│   │   ├── no_distinct.py
+│   │   └── field_alias.py
+│   ├── select/
+│   │   └── no_star_usage.py
+│   ├── join/
+│   │   ├── no_right_join.py
+│   │   ├── no_implicit_join.py
+│   │   └── no_cross_join.py
+│   ├── null/
+│   │   ├── no_null_direct_compare.py
+│   │   └── null_zero.py
+│   ├── partition/
+│   │   └── partition_required.py
+│   ├── cte/
+│   │   └── no_cte.py
+│   ├── subquery/
+│   │   └── no_in_subquery.py
+│   └── union/
+│       └── no_union.py
 └── convention/        # 规范检查（必须符合约定）
-    ├── field_alias.py
-    ├── group_by.py
-    ├── join_filter_first.py
-    ├── null_zero.py
-    ├── partition_filter.py
-    ├── subquery_alias.py
-    ├── table_alias.py
-    └── temp_table_naming.py
+    ├── alias/
+    │   ├── table_alias.py
+    │   └── subquery_alias.py
+    ├── format/
+    │   ├── keyword_uppercase.py
+    │   └── case_when_else.py
+    ├── aggregate/
+    │   └── group_by.py
+    ├── join/
+    │   └── join_filter_first.py
+    ├── naming/
+    │   └── temp_table_naming.py
+    ├── sort/
+    │   └── order_by_limit.py
+    └── subquery/
+        └── subquery_depth.py
 ```
 
 ## 当前启用的规则
 
-### 硬性违规项（命中即禁止，必须修复）
+### 硬性违规项（error，命中即禁止，必须修复）
 
 | 规则 ID | 触发关键字 | 文件 | 核心目标 |
 |---|---|---|---|
-| SQL-DISTINCT-001 | DISTINCT, COUNT(DISTINCT) | `no_distinct.py` | 消除 DISTINCT 写法 |
-| SQL-COUNT-001 | COUNT(*) | `no_count_star.py` | 消除 COUNT(*) 写法 |
-| SQL-COUNT-DISTINCT-001 | COUNT(DISTINCT ...) | `no_count_distinct.py` | 消除 COUNT(DISTINCT) 写法 |
-| SQL-JOIN-RIGHT-001 | RIGHT JOIN | `no_right_join.py` | 消除 RIGHT JOIN |
-| SQL-JOIN-IMPLICIT-001 | FROM a, b WHERE a.id=b.id | `no_implicit_join.py` | 改为显式 JOIN ... ON |
-| SQL-SELECT-STAR-001 | SELECT * | `no_select_star.py` | 改为显式字段 |
+| SQL-DISTINCT-001 | DISTINCT, COUNT(DISTINCT) | `aggregate/no_distinct.py` | 消除 DISTINCT 写法，改为 GROUP BY |
+| SQL-STAR-001 | SELECT *, COUNT(*), SUM(*), t.* | `select/no_star_usage.py` | 禁止所有 * 用法，明确列出字段 |
+| SQL-FIELD-ALIAS-001 | 聚合/CASE WHEN/计算字段 | `aggregate/field_alias.py` | 须有清晰别名，禁用 cnt/num/tmp 等 |
+| SQL-JOIN-RIGHT-001 | RIGHT JOIN | `join/no_right_join.py` | 消除 RIGHT JOIN，改用 LEFT JOIN |
+| SQL-JOIN-IMPLICIT-001 | FROM a, b WHERE a.id=b.id | `join/no_implicit_join.py` | 改为显式 JOIN ... ON |
+| SQL-CROSS-JOIN-001 | CROSS JOIN | `join/no_cross_join.py` | 禁止笛卡尔积 |
+| SQL-NULL-COMPARE-001 | a=NULL, a>NULL | `null/no_null_direct_compare.py` | 改用 IS NULL / IS NOT NULL / NVL() |
+| SQL-NULL-ZERO-001 | 除法运算 | `null/null_zero.py` | COALESCE(x/NULLIF(y,0),0) 保护 |
+| SQL-PARTITION-001 | 查询 Hive 表/明细表 | `partition/partition_required.py` | 必须有分区过滤(pt_d/pt_h/pt_m/pt_w) |
+| SQL-CTE-001 | WITH ... AS (SELECT ...) | `cte/no_cte.py` | 禁止 CTE，改用临时表 |
+| SQL-IN-SUBQUERY-001 | IN (SELECT ...) | `subquery/no_in_subquery.py` | 改用 JOIN 或 EXISTS |
+| SQL-UNION-001 | UNION（不带 ALL） | `union/no_union.py` | 改用 UNION ALL |
 
-### 规范检查项（必须符合约定）
+### 规范检查项（warning，必须符合约定）
 
 | 规则 ID | 触发关键字 | 文件 | 核心目标 |
 |---|---|---|---|
-| SQL-TABLE-ALIAS-001 | 多表/JOIN/子查询 | `table_alias.py` | 所有表必须有别名，字段引用必须带别名 |
-| SQL-SUBQUERY-ALIAS-001 | FROM/JOIN 后有嵌套 SELECT | `subquery_alias.py` | 子查询必须有别名 |
-| SQL-FIELD-ALIAS-001 | 聚合/CASE WHEN/计算字段 | `field_alias.py` | 须有清晰别名，禁用 cnt/num1/aaa 等无意义词 |
-| SQL-TEMP-TABLE-001 | CREATE/INSERT 含 tmp_ | `temp_table_naming.py` | 推荐格式: tmp\_{业务域}\_{描述}\_{日期} |
-| SQL-PARTITION-001 | 查询 Hive 表/明细表 | `partition_filter.py` | 必须有分区过滤(pt_d/pt_h)，条件需下推 |
-| SQL-JOIN-FILTER-001 | JOIN 大表/明细表 | `join_filter_first.py` | 必须先过滤后关联，条件下推至子查询 |
-| SQL-GROUP-BY-001 | 出现聚合函数 | `group_by.py` | 非聚合字段须全在 GROUP BY 中 |
-| SQL-NULL-ZERO-001 | 除法/比率/金额计算 | `null_zero.py` | 必须用 COALESCE(x/NULLIF(y,0),0) 做 NULL 和除零保护 |
+| SQL-TABLE-ALIAS-001 | 多表/JOIN/子查询 | `alias/table_alias.py` | 字段引用必须带表别名 |
+| SQL-SUBQUERY-ALIAS-001 | FROM/JOIN 后有嵌套 SELECT | `alias/subquery_alias.py` | 子查询必须有别名 |
+| SQL-KEYWORD-CASE-001 | SQL 关键词 | `format/keyword_uppercase.py` | 所有关键词必须大写 |
+| SQL-CASE-ELSE-001 | CASE WHEN | `format/case_when_else.py` | 必须包含 ELSE 分支 |
+| SQL-GROUP-BY-001 | 出现聚合函数 | `aggregate/group_by.py` | 非聚合字段须全在 GROUP BY 中 |
+| SQL-JOIN-FILTER-001 | JOIN 大表/明细表 | `join/join_filter_first.py` | 分区过滤下推至子查询 |
+| SQL-TEMP-TABLE-001 | CREATE/INSERT 含 tmp_ | `naming/temp_table_naming.py` | 格式: tmp\_{业务域}\_{描述}\_{日期} |
+| SQL-ORDER-LIMIT-001 | ORDER BY | `sort/order_by_limit.py` | 必须搭配 LIMIT |
+| SQL-NEST-DEPTH-001 | 嵌套子查询 | `subquery/subquery_depth.py` | 嵌套不超过 3 层 |
 
 ## 如何新增规则
 
 只需 **一步**：在 `checker/hard/` 或 `checker/convention/` 下新建 `.py` 文件，继承 `BaseChecker` 即可自动生效。
 
 ```python
-"""
-硬性规则 - 禁止 SELECT *
-
-触发关键字: SELECT *
-核心目标: 必须显式列出字段，不允许 SELECT *
-违规示例: SELECT * FROM t
-正确写法: SELECT t.user_id, t.order_id FROM t
-"""
 from sqlglot import exp
 
 from checker.base import BaseChecker, CheckContext, Violation
 
 
-class NoSelectStarChecker(BaseChecker):
-    rule_id = "SQL-SELECT-STAR-001"
+class NoCrossJoinChecker(BaseChecker):
+    rule_id = "SQL-CROSS-JOIN-001"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations = []
         for stmt in ctx.statements:
-            for select in stmt.find_all(exp.Select):
-                for expr in select.expressions:
-                    if isinstance(expr, exp.Star):
-                        violations.append(
-                            Violation(message="禁止使用 SELECT *，请显式列出字段")
-                        )
+            for node in stmt.walk():
+                if isinstance(node, exp.Join) and node.kind == "CROSS":
+                    violations.append(
+                        Violation(message="禁止使用 CROSS JOIN")
+                    )
         return violations
 ```
 
