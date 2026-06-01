@@ -1,6 +1,6 @@
 # Spark SQL 规范检查 MCP
 
-基于 FastMCP + SQLGlot 的 Spark SQL 公司规范检查服务。对外只暴露一个工具 `check_sql_compliance`，Agent 传入 SQL 即可获得违规报告。
+基于 FastMCP + SQLGlot 的 Spark SQL 公司规范检查服务。支持 MCP 工具（AI Agent 调用）和 CLI（终端/CI 直接使用）两种模式。
 
 ## 安装
 
@@ -11,59 +11,31 @@
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-克隆项目后，依赖自动管理，无需手动 pip install：
+克隆项目：
 
 ```bash
 git clone git@github.com:BrownCutie/data_analys.git
 cd data_analys/spark-sql-quality
 ```
 
-## 快速验证
+## 使用方式
 
-```bash
-uv run python3 -c "
-from checker.runner import RuleRunner
-import json
-runner = RuleRunner()
-result = runner.run('SELECT DISTINCT user_id FROM t')
-print(json.dumps(result, ensure_ascii=False, indent=2))
-"
-```
+### 方式一：MCP 工具（AI Agent 自动检查）
 
-输出示例：
+配置 MCP 客户端后，Agent 在生成 SQL 时会自动调用 `check_sql_compliance` 工具进行检查。
 
-```json
-{
-  "passed": false,
-  "violations": [
-    {
-      "rule": "SQL-DISTINCT-001",
-      "message": "禁止使用 DISTINCT，请改为 GROUP BY 去重",
-      "severity": "error"
-    },
-    {
-      "rule": "SQL-PARTITION-001",
-      "message": "查询缺少分区过滤，WHERE 中必须包含 pt_d / pt_h / pt_m / pt_w 条件",
-      "severity": "warning"
-    }
-  ]
-}
-```
+配置中 `PROJECT_DIR` 替换为项目绝对路径，例如 `/Users/xxx/data_analys/spark-sql-quality`。
 
-## 配置 MCP 客户端
-
-以下配置中 `PROJECT_DIR` 替换为实际路径，例如 `/Users/browncutie/Programme/data_analysis/spark-sql-quality`。
-
-### OpenCode
+#### OpenCode
 
 编辑 `~/.config/opencode/opencode.json`：
 
 ```json
 {
-  "mcp": {
+  "mcpServers": {
     "spark-sql-quality": {
-      "type": "local",
-      "command": ["uv", "run", "--directory", "PROJECT_DIR", "fastmcp", "run", "server.py"]
+      "command": "uv",
+      "args": ["run", "--directory", "PROJECT_DIR", "fastmcp", "run", "server.py"]
     }
   }
 }
@@ -78,9 +50,10 @@ opencode mcp add
 # Command: uv run --directory PROJECT_DIR fastmcp run server.py
 ```
 
-重启 OpenCode 后生效。
+> 另一台电脑配置方式相同，把 `PROJECT_DIR` 换成那台电脑上的项目路径即可。
+> 前提：那台电脑需要先 `git clone` 项目并安装 `uv`。
 
-### Claude Code
+#### Claude Code
 
 在项目目录下创建 `.mcp.json`：
 
@@ -95,7 +68,7 @@ opencode mcp add
 }
 ```
 
-### Cursor
+#### Cursor
 
 设置 → MCP → Add new MCP Server：
 
@@ -105,10 +78,57 @@ opencode mcp add
 | Type | command |
 | Command | `uv run --directory PROJECT_DIR fastmcp run server.py` |
 
+### 方式二：CLI（终端 / CI / pre-commit hook）
+
+```bash
+# 直接检查 SQL
+uv run --directory PROJECT_DIR python cli.py "SELECT DISTINCT user_id FROM t"
+
+# 从文件读取
+uv run --directory PROJECT_DIR python cli.py -f query.sql
+
+# 静默模式（只输出 PASS/FAIL，适合 CI 判断）
+uv run --directory PROJECT_DIR python cli.py -f query.sql --quiet
+echo $?  # 0=通过, 1=违规
+
+# 在当前项目目录下可省略 --directory
+cd /path/to/spark-sql-quality
+uv run python cli.py "SELECT * FROM t"
+```
+
+#### pre-commit hook 配置
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: local
+    hooks:
+      - id: sql-compliance
+        entry: uv run --directory /path/to/spark-sql-quality python cli.py -f
+        language: system
+        files: \.sql$
+```
+
+## 快速验证
+
+```bash
+# CLI 验证
+uv run python cli.py "SELECT DISTINCT * FROM t WHERE pt_d = '20260101'"
+```
+
+输出示例：
+
+```
+FAIL — 2 条违规:
+  [ERROR] SQL-DISTINCT-001: 禁止使用 DISTINCT，请改为 GROUP BY 去重
+  [ERROR] SQL-STAR-001: 禁止 SELECT *，请明确列出需要的字段
+```
+
 ## 项目结构
 
 ```
 server.py              # MCP 入口，注册 check_sql_compliance 工具
+cli.py                # CLI 入口，支持直接检查和文件读取
 config.py              # 加载 rules.yaml（黑名单机制）
 rules.yaml             # 禁用规则列表，默认全部执行
 checker/
