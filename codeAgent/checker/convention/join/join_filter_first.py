@@ -20,8 +20,6 @@ PARTITION_FIELDS = {"pt_d", "pt_h", "pt_m", "pt_w"}
 
 class JoinFilterFirstChecker(BaseChecker):
     rule_id = "SQL-JOIN-FILTER-001"
-    name = "先过滤后关联"
-    desc = "分区过滤条件必须下推到 JOIN 前的子查询中，不能在外层 JOIN 后才过滤"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

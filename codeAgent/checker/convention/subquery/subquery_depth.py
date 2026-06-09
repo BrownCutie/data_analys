@@ -21,8 +21,6 @@ MAX_DEPTH = 3
 
 class SubqueryDepthChecker(BaseChecker):
     rule_id = "SQL-NEST-DEPTH-001"
-    name = "子查询嵌套限制"
-    desc = "子查询嵌套不超过 3 层，过深应拆分为临时表"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

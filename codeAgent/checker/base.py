@@ -18,8 +18,6 @@ class CheckContext:
 
 class BaseChecker(ABC):
     rule_id: str
-    name: str = ""
-    desc: str = ""
 
     @abstractmethod
     def check(self, ctx: CheckContext) -> list[Violation]:

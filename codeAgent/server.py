@@ -2,7 +2,7 @@ from fastmcp import FastMCP
 
 from checker.runner import RuleRunner
 
-mcp = FastMCP("spark-sql-check-sql-agent")
+mcp = FastMCP("spark-sql-check-code-agent")
 
 runner = RuleRunner()
 
@@ -18,6 +18,7 @@ def check_sql_compliance(sql: str) -> dict:
     severity 取值：error（硬性违规，必须修复）/ warning（规范检查，必须符合约定）
     """
     return runner.run(sql)
+
 
 if __name__ == "__main__":
     mcp.run()

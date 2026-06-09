@@ -84,8 +84,6 @@ _STRING_LITERAL_PATTERN = re.compile(r"'(?:[^'\\]|\\.)*'")
 
 class KeywordUppercaseChecker(BaseChecker):
     rule_id = "SQL-KEYWORD-CASE-001"
-    name = "关键词大写"
-    desc = "SQL 关键词（SELECT、FROM、WHERE 等）必须使用大写"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

@@ -26,8 +26,6 @@ _COMPARE_TYPES = (exp.EQ, exp.NEQ, exp.GT, exp.LT, exp.GTE, exp.LTE, exp.Like)
 
 class NullDirectCompareChecker(BaseChecker):
     rule_id = "SQL-NULL-COMPARE-001"
-    name = "禁止NULL直接比较"
-    desc = "禁止对 NULL 使用 =、!=、> 等运算符，请使用 IS NULL / IS NOT NULL / NVL()"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
