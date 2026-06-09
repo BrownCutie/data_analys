@@ -15,7 +15,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ```bash
 git clone git@github.com:BrownCutie/data_analys.git
-cd data_analys/spark-sql-quality
+cd data_analys/spark-sql-check-mcp-server
 ```
 
 ## 使用方式
@@ -24,7 +24,7 @@ cd data_analys/spark-sql-quality
 
 配置 MCP 客户端后，Agent 在生成 SQL 时会自动调用 `check_sql_compliance` 工具进行检查。
 
-配置中 `PROJECT_DIR` 替换为项目绝对路径，例如 `/Users/xxx/data_analys/spark-sql-quality`。
+配置中 `PROJECT_DIR` 替换为项目绝对路径，例如 `/Users/xxx/data_analys/spark-sql-check-mcp-server`。
 
 #### OpenCode
 
@@ -33,7 +33,7 @@ cd data_analys/spark-sql-quality
 ```json
 {
   "mcpServers": {
-    "spark-sql-quality": {
+    "spark-sql-check-mcp-server": {
       "command": "uv",
       "args": ["run", "--directory", "PROJECT_DIR", "fastmcp", "run", "server.py"]
     }
@@ -45,7 +45,7 @@ cd data_analys/spark-sql-quality
 
 ```bash
 opencode mcp add
-# Name: spark-sql-quality
+# Name: spark-sql-check-mcp-server
 # Type: local
 # Command: uv run --directory PROJECT_DIR fastmcp run server.py
 ```
@@ -60,7 +60,7 @@ opencode mcp add
 ```json
 {
   "mcpServers": {
-    "spark-sql-quality": {
+    "spark-sql-check-mcp-server": {
       "command": "uv",
       "args": ["run", "--directory", "PROJECT_DIR", "fastmcp", "run", "server.py"]
     }
@@ -74,7 +74,7 @@ opencode mcp add
 
 | 字段 | 值 |
 |---|---|
-| Name | spark-sql-quality |
+| Name | spark-sql-check-mcp-server |
 | Type | command |
 | Command | `uv run --directory PROJECT_DIR fastmcp run server.py` |
 
@@ -92,7 +92,7 @@ uv run --directory PROJECT_DIR python cli.py -f query.sql --quiet
 echo $?  # 0=通过, 1=违规
 
 # 在当前项目目录下可省略 --directory
-cd /path/to/spark-sql-quality
+cd /path/to/spark-sql-check-mcp-server
 uv run python cli.py "SELECT * FROM t"
 ```
 
@@ -104,7 +104,7 @@ repos:
   - repo: local
     hooks:
       - id: sql-compliance
-        entry: uv run --directory /path/to/spark-sql-quality python cli.py -f
+        entry: uv run --directory /path/to/spark-sql-check-mcp-server python cli.py -f
         language: system
         files: \.sql$
 ```

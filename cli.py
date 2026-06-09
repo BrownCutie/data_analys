@@ -1,9 +1,9 @@
 """Spark SQL 规范检查 CLI
 
 用法:
-  uv run --directory /path/to/spark-sql-quality python cli.py "SELECT * FROM t"
-  uv run --directory /path/to/spark-sql-quality python cli.py -f query.sql
-  uv run --directory /path/to/spark-sql-quality python cli.py -f query.sql --quiet
+  uv run --directory /path/to/spark-sql-check-mcp-server python cli.py "SELECT * FROM t"
+  uv run --directory /path/to/spark-sql-check-mcp-server python cli.py -f query.sql
+  uv run --directory /path/to/spark-sql-check-mcp-server python cli.py -f query.sql --quiet
 """
 
 from __future__ import annotations

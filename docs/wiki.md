@@ -226,7 +226,7 @@ MCP 是标准协议，一次部署，多个客户端可用：
 
 ```bash
 git clone git@github.com:BrownCutie/data_analys.git
-cd data_analys/spark-sql-quality
+cd data_analys/spark-sql-check-mcp-server
 
 # 验证是否正常工作
 uv run python3 -c "

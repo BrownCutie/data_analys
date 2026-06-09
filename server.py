@@ -2,7 +2,7 @@ from fastmcp import FastMCP
 
 from checker.runner import RuleRunner
 
-mcp = FastMCP("spark-sql-quality-mcp")
+mcp = FastMCP("spark-sql-check-mcp-server")
 
 runner = RuleRunner()
 

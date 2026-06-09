@@ -1,5 +1,5 @@
 [project]
-name = "spark-sql-quality-mcp"
+name = "spark-sql-check-mcp-server"
 version = "0.1.0"
 description = "Spark SQL 公司规范检查 MCP 服务"
 requires-python = ">=3.11"
