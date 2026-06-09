@@ -1,9 +1,9 @@
-"""Spark SQL 规范检查 CLI（sqlAgent 版本）
+"""Spark SQL 规范检查 CLI（codeAgent 版本）
 
 用法:
-  uv run --directory /path/to/spark-sql-check-mcp-server/sqlAgent python cli.py "SELECT * FROM t"
-  uv run --directory /path/to/spark-sql-check-mcp-server/sqlAgent python cli.py -f query.sql
-  uv run --directory /path/to/spark-sql-check-mcp-server/sqlAgent python cli.py -f query.sql --quiet
+  uv run --directory /path/to/spark-sql-check-mcp-server/codeAgent python cli.py "SELECT * FROM t"
+  uv run --directory /path/to/spark-sql-check-mcp-server/codeAgent python cli.py -f query.sql
+  uv run --directory /path/to/spark-sql-check-mcp-server/codeAgent python cli.py -f query.sql --quiet
 """
 
 from __future__ import annotations
