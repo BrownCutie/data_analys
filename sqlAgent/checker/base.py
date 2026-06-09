@@ -7,7 +7,6 @@ from dataclasses import dataclass, field
 @dataclass
 class Violation:
     message: str
-    severity: str = "error"
 
 
 @dataclass

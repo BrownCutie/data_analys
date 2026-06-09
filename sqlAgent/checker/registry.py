@@ -1,5 +1,5 @@
 """
-自动扫描 registry — 递归扫描 checker/hard 和 checker/convention 下所有 .py 文件，
+自动扫描 registry — 递归扫描 checker 下所有一级子目录中的 .py 文件，
 找到 BaseChecker 子类，用它们的 rule_id 构建映射。
 新增规则只需写 .py 文件，不用改这个文件。
 """
@@ -16,13 +16,12 @@ _CHECKER_ROOT = Path(__file__).parent
 
 
 def _discover_checkers() -> dict[str, type[BaseChecker]]:
-    """递归扫描 hard/ 和 convention/ 下所有 .py，找到 BaseChecker 子类"""
+    """递归扫描 checker 下所有一级子目录，找到 BaseChecker 子类"""
     registry: dict[str, type[BaseChecker]] = {}
-    for subdir in ("hard", "convention"):
-        search_dir = _CHECKER_ROOT / subdir
-        if not search_dir.exists():
+    for subdir in _CHECKER_ROOT.iterdir():
+        if not subdir.is_dir() or subdir.name.startswith("_"):
             continue
-        for py_file in sorted(search_dir.rglob("*.py")):
+        for py_file in sorted(subdir.rglob("*.py")):
             if py_file.name.startswith("_"):
                 continue
             rel_path = py_file.relative_to(_CHECKER_ROOT.parent)

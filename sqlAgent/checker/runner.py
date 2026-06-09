@@ -22,7 +22,7 @@ class RuleRunner:
             return {"passed": False, "violations": [], "parse_error": str(e)}
 
         # 2. 确定 rule_list
-        if rule_list is not None:
+        if rule_list:
             unknown = [rid for rid in rule_list if rid not in RULE_REGISTRY]
             if unknown:
                 return {"passed": False, "violations": [], "error": f"未知的 rule_id: {', '.join(unknown)}"}
@@ -37,7 +37,7 @@ class RuleRunner:
             checker = RULE_REGISTRY[rule_id]()
             try:
                 for v in checker.check(ctx):
-                    results.append({"rule": rule_id, "message": v.message, "severity": v.severity})
+                    results.append({"rule": rule_id, "message": v.message})
             except Exception:
                 logger.exception("Checker %s 执行异常", rule_id)
 
