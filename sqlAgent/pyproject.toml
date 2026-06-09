@@ -1,7 +1,7 @@
 [project]
-name = "spark-sql-check-mcp-server"
+name = "spark-sql-check-sql-agent"
 version = "0.1.0"
-description = "Spark SQL 公司规范检查 MCP 服务"
+description = "Spark SQL 规范检查 MCP 服务（sqlAgent 版本）"
 requires-python = ">=3.11"
 dependencies = [
     "fastmcp",
@@ -16,6 +16,3 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-
-[tool.ruff]
-src = ["."]

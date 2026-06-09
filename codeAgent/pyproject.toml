@@ -1,0 +1,18 @@
+[project]
+name = "spark-sql-check-code-agent"
+version = "0.1.0"
+description = "Spark SQL 规范检查 MCP 服务（codeAgent 版本）"
+requires-python = ">=3.11"
+dependencies = [
+    "fastmcp",
+    "sqlglot",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
