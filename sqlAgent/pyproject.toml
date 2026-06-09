@@ -1,5 +1,5 @@
 [project]
-name = "spark-sql-check-code-agent"
+name = "spark-sql-check-mcp-server"
 version = "0.1.0"
 description = "Spark SQL 规范检查 MCP 服务（codeAgent 版本）"
 requires-python = ">=3.11"

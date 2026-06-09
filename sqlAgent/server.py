@@ -3,7 +3,7 @@ from fastmcp import FastMCP
 from checker.registry import RULE_REGISTRY
 from checker.runner import RuleRunner
 
-mcp = FastMCP("spark-sql-check-sql-agent")
+mcp = FastMCP("spark-sql-check-mcp-server")
 
 runner = RuleRunner()
 
