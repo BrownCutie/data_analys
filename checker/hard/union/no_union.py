@@ -20,6 +20,8 @@ class NoUnionChecker(BaseChecker):
     """
 
     rule_id = "SQL-UNION-001"
+    name = "禁止UNION"
+    desc = "禁止 UNION（不带 ALL），UNION 隐式去重等同于 DISTINCT，请改用 UNION ALL"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

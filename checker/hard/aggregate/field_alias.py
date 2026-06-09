@@ -49,6 +49,8 @@ def _contains_aggregate_or_computed(node: exp.Expression) -> bool:
 
 class FieldAliasChecker(BaseChecker):
     rule_id = "SQL-FIELD-ALIAS-001"
+    name = "聚合字段别名"
+    desc = "聚合函数、CASE WHEN、算术表达式必须有清晰的 AS 别名，禁用 cnt/num/tmp 等无意义别名"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

@@ -18,6 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class SubqueryAliasChecker(BaseChecker):
     rule_id = "SQL-SUBQUERY-ALIAS-001"
+    name = "子查询别名"
+    desc = "所有子查询必须有表别名"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

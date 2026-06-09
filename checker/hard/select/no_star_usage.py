@@ -23,6 +23,8 @@ _AGGREGATE_TYPES = (exp.Count, exp.Sum, exp.Avg, exp.Min, exp.Max)
 
 class NoStarUsageChecker(BaseChecker):
     rule_id = "SQL-STAR-001"
+    name = "禁止星号"
+    desc = "禁止所有 * 用法，包括 SELECT * / COUNT(*) / SUM(*) / t.* 等，请明确列出字段"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

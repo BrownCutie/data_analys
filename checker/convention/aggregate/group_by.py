@@ -21,6 +21,8 @@ AGGREGATE_FUNCS = (exp.Count, exp.Sum, exp.Avg, exp.Min, exp.Max)
 
 class GroupByChecker(BaseChecker):
     rule_id = "SQL-GROUP-BY-001"
+    name = "GROUP BY完整性"
+    desc = "SELECT 中的非聚合字段必须全部出现在 GROUP BY 中"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

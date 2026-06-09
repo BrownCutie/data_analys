@@ -24,6 +24,8 @@ TMP_NAME_PATTERN = re.compile(r"^tmp_[a-z][a-z0-9]*_[a-z][a-z0-9]*(?:_\d{8})?$")
 
 class TempTableNamingChecker(BaseChecker):
     rule_id = "SQL-TEMP-TABLE-001"
+    name = "临时表命名"
+    desc = "临时表命名格式须符合 tmp_{业务域}_{描述}_{日期}"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

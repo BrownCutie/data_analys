@@ -20,6 +20,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoDistinctChecker(BaseChecker):
     rule_id = "SQL-DISTINCT-001"
+    name = "禁止DISTINCT"
+    desc = "消除所有 DISTINCT 用法，包括 SELECT DISTINCT 和 COUNT(DISTINCT x)，请改为 GROUP BY 去重"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

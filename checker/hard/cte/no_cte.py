@@ -19,6 +19,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoCteChecker(BaseChecker):
     rule_id = "SQL-CTE-001"
+    name = "禁止CTE"
+    desc = "禁止 WITH CTE，请改用临时表（CREATE TABLE tmp_xxx AS SELECT ...）"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

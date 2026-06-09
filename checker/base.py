@@ -17,7 +17,9 @@ class CheckContext:
 
 
 class BaseChecker(ABC):
-    rule_id: str  # 每个checker必须声明自己的rule_id
+    rule_id: str
+    name: str = ""
+    desc: str = ""
 
     @abstractmethod
     def check(self, ctx: CheckContext) -> list[Violation]:

@@ -20,6 +20,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NullZeroChecker(BaseChecker):
     rule_id = "SQL-NULL-ZERO-001"
+    name = "除零保护"
+    desc = "除法运算必须用 COALESCE(x / NULLIF(y, 0), 0) 做 NULL 和除零保护"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

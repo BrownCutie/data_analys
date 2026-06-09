@@ -20,6 +20,8 @@ class NoInSubqueryChecker(BaseChecker):
     """
 
     rule_id = "SQL-IN-SUBQUERY-001"
+    name = "禁止IN子查询"
+    desc = "禁止 IN (SELECT ...)，容易导致 BroadcastNestedLoopJoin，请改用 JOIN 或 EXISTS"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

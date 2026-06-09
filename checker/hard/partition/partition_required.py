@@ -22,6 +22,8 @@ PARTITION_FIELDS = {"pt_d", "pt_h", "pt_m", "pt_w"}
 
 class PartitionRequiredChecker(BaseChecker):
     rule_id = "SQL-PARTITION-001"
+    name = "分区过滤"
+    desc = "查询必须有分区过滤条件（pt_d/pt_h/pt_m/pt_w），禁止全表扫描"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

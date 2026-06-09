@@ -18,6 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class OrderByLimitChecker(BaseChecker):
     rule_id = "SQL-ORDER-LIMIT-001"
+    name = "ORDER BY需LIMIT"
+    desc = "ORDER BY 必须搭配 LIMIT，无 LIMIT 的全局排序会触发全量 shuffle"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

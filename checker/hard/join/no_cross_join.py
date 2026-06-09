@@ -18,6 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoCrossJoinChecker(BaseChecker):
     rule_id = "SQL-CROSS-JOIN-001"
+    name = "禁止CROSS JOIN"
+    desc = "禁止显式 CROSS JOIN，笛卡尔积通常不是业务需要"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

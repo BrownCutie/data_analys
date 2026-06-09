@@ -18,6 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoImplicitJoinChecker(BaseChecker):
     rule_id = "SQL-JOIN-IMPLICIT-001"
+    name = "禁止隐式JOIN"
+    desc = "禁止用逗号分隔多表（FROM a, b WHERE），请改为显式 JOIN ... ON"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []

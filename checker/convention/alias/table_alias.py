@@ -18,6 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class TableAliasChecker(BaseChecker):
     rule_id = "SQL-TABLE-ALIAS-001"
+    name = "表别名"
+    desc = "多表/JOIN/子查询时，字段引用必须带表别名前缀"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
