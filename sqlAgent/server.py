@@ -33,3 +33,6 @@ def check_sql_compliance(sql: str, rule_list: list[str] = []) -> dict:
     severity 取值：error（硬性违规，必须修复）/ warning（规范检查，必须符合约定）
     """
     return runner.run(sql, rule_list=rule_list if rule_list else None)
+
+if __name__ == "__main__":
+    mcp.run()
