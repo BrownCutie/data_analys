@@ -6,15 +6,13 @@ import sqlglot
 
 from checker.base import CheckContext, Violation
 from checker.registry import RULE_REGISTRY
-from config import load_disabled_rules
 
 logger = logging.getLogger(__name__)
 
 
 class RuleRunner:
     def __init__(self) -> None:
-        disabled = load_disabled_rules()
-        self.checker_ids = [rid for rid in RULE_REGISTRY if rid not in disabled]
+        self.checker_ids = list(RULE_REGISTRY.keys())
 
     def run(self, sql: str, rule_list: list[str] | None = None) -> dict:
         # 1. parse
