@@ -90,15 +90,19 @@ class KeywordUppercaseChecker(BaseChecker):
         # Replace string literals with placeholders to avoid false positives
         sanitized = _STRING_LITERAL_PATTERN.sub("''", ctx.raw_sql)
 
-        seen: set[str] = set()
+        non_compliant: set[str] = set()
         for match in _KEYWORDS_PATTERN.finditer(sanitized):
             matched_text = match.group(1)
-            if matched_text != matched_text.upper() and matched_text.lower() not in seen:
-                seen.add(matched_text.lower())
-                violations.append(
-                    Violation(
-                        message=f"SQL 关键词 '{matched_text}' 应使用大写，请改为 '{matched_text.upper()}'",
-                        severity="warning",
-                    )
-                )
-        return violations
+            if matched_text != matched_text.upper():
+                non_compliant.add(matched_text.lower())
+
+        if not non_compliant:
+            return []
+
+        keyword_list = ", ".join(sorted(non_compliant))
+        return [
+            Violation(
+                message=f"以下 SQL 关键词应使用大写: {keyword_list}",
+                severity="warning",
+            )
+        ]

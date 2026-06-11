@@ -19,8 +19,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoCteChecker(BaseChecker):
     rule_id = "SQL-CTE-001"
-    name = "禁止CTE"
-    desc = "禁止 WITH CTE，请改用临时表（CREATE TABLE tmp_xxx AS SELECT ...）"
+    name = "不使用 WITH 语句"
+    desc = "检查是否使用了 WITH 子句（CTE）。CTE 不利于任务排查和数据复用，团队规范要求改用物理临时表。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -28,8 +28,7 @@ class NoCteChecker(BaseChecker):
             if stmt.find(exp.With):
                 violations.append(
                     Violation(
-                        message="禁止使用 WITH CTE，请改用临时表"
-                        "（CREATE TABLE tmp_xxx AS SELECT ...）"
+                        message="检测到 WITH CTE 语法，请改写为 CREATE TABLE tmp_{描述}_{日期} AS SELECT ... 形式的临时表。"
                     )
                 )
         return violations

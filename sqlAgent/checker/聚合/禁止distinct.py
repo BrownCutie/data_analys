@@ -20,8 +20,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class ForbidDistinctChecker(BaseChecker):
     rule_id = "SQL-DISTINCT-001"
-    name = "禁止DISTINCT"
-    desc = "消除所有 DISTINCT 用法，包括 SELECT DISTINCT 和 COUNT(DISTINCT x)，请改为 GROUP BY 去重"
+    name = "禁止 DISTINCT 去重"
+    desc = "检查是否使用了 DISTINCT 去重，包括 SELECT DISTINCT 和 COUNT(DISTINCT)。全局去重开销大，建议用 GROUP BY 替代。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -29,6 +29,6 @@ class ForbidDistinctChecker(BaseChecker):
             for node in statement.walk():
                 if isinstance(node, exp.Distinct):
                     violations.append(
-                        Violation(message="禁止使用 DISTINCT，请改为 GROUP BY 去重")
+                        Violation(message="检测到 DISTINCT 用法，请改为 GROUP BY 实现去重。")
                     )
         return violations

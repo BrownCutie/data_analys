@@ -25,8 +25,8 @@ def _discover_checkers() -> dict[str, type[BaseChecker]]:
         for py_file in sorted(search_dir.rglob("*.py")):
             if py_file.name.startswith("_"):
                 continue
-            rel_path = py_file.relative_to(_CHECKER_ROOT.parent)
-            module_name = str(rel_path.with_suffix("")).replace("/", ".")
+            rel_path = py_file.relative_to(_CHECKER_ROOT.parent).with_suffix("")
+            module_name = ".".join(rel_path.parts)
             try:
                 module = importlib.import_module(module_name)
             except ImportError:

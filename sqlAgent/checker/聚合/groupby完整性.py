@@ -23,8 +23,8 @@ _AGGREGATE_TYPES = (
 
 class GroupByCompletenessChecker(BaseChecker):
     rule_id = "SQL-GROUP-BY-001"
-    name = "GROUP BY完整性"
-    desc = "SELECT 中的非聚合字段必须全部出现在 GROUP BY 中"
+    name = "GROUP BY 字段完整"
+    desc = "检查 SELECT 中的非聚合字段是否都出现在 GROUP BY 中。遗漏会导致结果不正确或执行报错。"
 
     def _contains_aggregate(self, node: exp.Expression) -> bool:
         """判断表达式中是否包含聚合函数"""
@@ -75,7 +75,7 @@ class GroupByCompletenessChecker(BaseChecker):
                     if col.name not in group_cols:
                         violations.append(
                             Violation(
-                                message=f"字段 '{col.name}' 在 SELECT 中但不在 GROUP BY 中"
+                                message=f"字段 '{col.name}' 出现在 SELECT 中但未包含在 GROUP BY，请补入 GROUP BY 或改为聚合函数。"
                             )
                         )
         return violations

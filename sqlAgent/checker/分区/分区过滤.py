@@ -22,8 +22,8 @@ PARTITION_FIELDS = {"pt_d", "pt_h", "pt_m", "pt_w"}
 
 class PartitionFilterChecker(BaseChecker):
     rule_id = "SQL-PARTITION-001"
-    name = "分区过滤"
-    desc = "查询必须有分区过滤条件（pt_d/pt_h/pt_m/pt_w），禁止全表扫描"
+    name = "必须过滤分区"
+    desc = "检查查询是否包含分区字段过滤（pt_d/pt_h/pt_m/pt_w）。缺少分区过滤会导致全表扫描，严重影响集群资源。"
 
     def _has_partition_condition(self, where_clause: exp.Expression) -> bool:
         """检查 WHERE 子句中是否包含分区字段"""
@@ -41,7 +41,7 @@ class PartitionFilterChecker(BaseChecker):
                 if not where_clause:
                     violations.append(
                         Violation(
-                            message="查询缺少分区过滤，WHERE 中必须包含 pt_d / pt_h / pt_m / pt_w 条件"
+                            message="查询缺少分区过滤条件，请在 WHERE 中添加 pt_d / pt_h / pt_m / pt_w 之一。",
                         )
                     )
                     continue
@@ -50,7 +50,7 @@ class PartitionFilterChecker(BaseChecker):
                 if not self._has_partition_condition(where_clause):
                     violations.append(
                         Violation(
-                            message="查询缺少分区过滤，WHERE 中必须包含 pt_d / pt_h / pt_m / pt_w 条件"
+                            message="查询缺少分区过滤条件，请在 WHERE 中添加 pt_d / pt_h / pt_m / pt_w 之一。",
                         )
                     )
         return violations

@@ -19,8 +19,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class ForbidCrossJoinChecker(BaseChecker):
     rule_id = "SQL-CROSS-JOIN-001"
-    name = "禁止CROSS JOIN"
-    desc = "禁止显式 CROSS JOIN，笛卡尔积通常不是业务需要"
+    name = "禁止笛卡尔积关联"
+    desc = "检查是否使用了 CROSS JOIN。笛卡尔积会产生海量无效数据，严重影响查询性能。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -29,6 +29,6 @@ class ForbidCrossJoinChecker(BaseChecker):
                 kind = node.args.get("kind")
                 if kind and kind.upper() == "CROSS":
                     violations.append(
-                        Violation(message="禁止使用 CROSS JOIN，笛卡尔积会导致性能问题")
+                        Violation(message="检测到 CROSS JOIN，请确认业务必要性；如非必须，请添加关联条件改为 INNER JOIN 或 LEFT JOIN。")
                     )
         return violations

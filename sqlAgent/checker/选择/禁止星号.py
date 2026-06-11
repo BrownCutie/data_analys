@@ -24,8 +24,8 @@ _AGGREGATE_TYPES = (exp.Count, exp.Sum, exp.Avg, exp.Min, exp.Max)
 
 class ForbidStarChecker(BaseChecker):
     rule_id = "SQL-STAR-001"
-    name = "禁止星号"
-    desc = "禁止所有 * 用法，包括 SELECT * / COUNT(*) / SUM(*) / t.* 等，请明确列出字段"
+    name = "禁止 SELECT *"
+    desc = "检查是否使用了星号通配（SELECT *、COUNT(*)、t.* 等）。明确列出字段可避免多余 IO 和表结构变更带来的风险。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -38,14 +38,14 @@ class ForbidStarChecker(BaseChecker):
 
                 if isinstance(parent, exp.Select):
                     violations.append(
-                        Violation(message="禁止 SELECT *，请明确列出需要的字段")
+                        Violation(message="检测到 SELECT *，请逐一列出需要的字段名。")
                     )
                 elif isinstance(parent, _AGGREGATE_TYPES):
                     violations.append(
-                        Violation(message="禁止在聚合函数中使用 *，请替换为具体字段或 1")
+                        Violation(message="检测到聚合函数中使用 *，请替换为具体字段名或常量 1。")
                     )
                 else:
                     violations.append(
-                        Violation(message="禁止使用 *，请替换为具体字段")
+                        Violation(message="检测到 * 通配符用法，请替换为具体字段名。")
                     )
         return violations

@@ -20,8 +20,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoInSubqueryChecker(BaseChecker):
     rule_id = "SQL-IN-SUBQUERY-001"
-    name = "禁止IN子查询"
-    desc = "禁止 IN (SELECT ...)，容易导致 BroadcastNestedLoopJoin，请改用 JOIN 或 EXISTS"
+    name = "禁止 IN 子查询"
+    desc = "检查是否使用了 IN (SELECT ...) 子查询。该写法在 Spark 中易触发低效执行计划。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -32,7 +32,7 @@ class NoInSubqueryChecker(BaseChecker):
                     if node.args.get("query") is not None:
                         violations.append(
                             Violation(
-                                message="禁止使用 IN (SELECT ...) 子查询，请改用 JOIN 或 EXISTS",
+                                message="检测到 IN (SELECT ...) 子查询，请改写为 JOIN 或 EXISTS。",
                             )
                         )
 

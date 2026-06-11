@@ -18,8 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class ForbidRightJoinChecker(BaseChecker):
     rule_id = "SQL-JOIN-RIGHT-001"
-    name = "禁止RIGHT JOIN"
-    desc = "禁止使用 RIGHT JOIN，请调整表顺序改为 LEFT JOIN"
+    name = "禁止 RIGHT JOIN"
+    desc = "检查是否使用了 RIGHT JOIN。统一使用 LEFT JOIN 可降低阅读和维护成本。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -28,6 +28,6 @@ class ForbidRightJoinChecker(BaseChecker):
                 side = node.args.get("side")
                 if side and side.upper() == "RIGHT":
                     violations.append(
-                        Violation(message="禁止使用 RIGHT JOIN，请调整表顺序改为 LEFT JOIN")
+                        Violation(message="检测到 RIGHT JOIN，请交换主从表顺序，改写为 LEFT JOIN。")
                     )
         return violations

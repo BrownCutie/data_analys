@@ -19,8 +19,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class CaseWhenElseChecker(BaseChecker):
     rule_id = "SQL-CASE-ELSE-001"
-    name = "CASE必须有ELSE"
-    desc = "CASE WHEN 必须包含 ELSE 分支，缺失 ELSE 会产生 NULL 值"
+    name = "CASE 必须有 ELSE"
+    desc = "检查 CASE WHEN 是否包含 ELSE 分支。缺少 ELSE 时未匹配的行会返回 NULL，可能导致下游计算异常。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -30,7 +30,7 @@ class CaseWhenElseChecker(BaseChecker):
                 if default is None:
                     violations.append(
                         Violation(
-                            message="CASE WHEN 必须包含 ELSE 分支，缺失 ELSE 会产生 NULL",
+                            message="检测到 CASE WHEN 缺少 ELSE 分支，请补充 ELSE 及默认值。",
                         )
                     )
         return violations

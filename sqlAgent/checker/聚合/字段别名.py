@@ -31,8 +31,8 @@ ALIAS_REQUIRED_TYPES = (
 
 class FieldAliasChecker(BaseChecker):
     rule_id = "SQL-FIELD-ALIAS-001"
-    name = "聚合字段别名"
-    desc = "聚合函数、CASE WHEN、算术表达式必须有清晰的 AS 别名，禁用 cnt/num/tmp 等无意义别名"
+    name = "计算字段需命名"
+    desc = "检查聚合函数、CASE、算术表达式是否定义了有意义的 AS 别名。清晰别名便于下游引用和理解业务含义。"
 
     def _needs_alias(self, node: exp.Expression) -> bool:
         """判断表达式是否是聚合/CASE/IF 类型，需要别名"""
@@ -75,12 +75,12 @@ class FieldAliasChecker(BaseChecker):
 
                     if alias_name is None:
                         violations.append(
-                            Violation(message="聚合/计算字段必须有 AS 别名")
+                            Violation(message="聚合或计算字段缺少 AS 别名，请补充能表达业务含义的别名（避免 cnt/num/tmp 等）。")
                         )
                     elif alias_name.lower() in BAD_ALIASES:
                         violations.append(
                             Violation(
-                                message=f"别名 '{alias_name}' 无意义，请使用能表达业务含义的名称"
+                                message=f"别名 '{alias_name}' 语义不明确，请改为能表达业务含义的名称。"
                             )
                         )
         return violations

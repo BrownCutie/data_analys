@@ -20,8 +20,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class NoUnionChecker(BaseChecker):
     rule_id = "SQL-UNION-001"
-    name = "禁止UNION"
-    desc = "禁止 UNION（不带 ALL），UNION 隐式去重等同于 DISTINCT，请改用 UNION ALL"
+    name = "禁止 UNION 去重"
+    desc = "检查是否使用了不带 ALL 的 UNION。UNION 会隐式去重，性能开销大且语义不清晰。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -32,7 +32,7 @@ class NoUnionChecker(BaseChecker):
                     if node.args.get("distinct") is True:
                         violations.append(
                             Violation(
-                                message="禁止使用 UNION，请改用 UNION ALL（UNION 会隐式去重，等同于 DISTINCT）",
+                                message="检测到 UNION 去重，请改为 UNION ALL；如需去重请用 GROUP BY 显式实现。",
                             )
                         )
 

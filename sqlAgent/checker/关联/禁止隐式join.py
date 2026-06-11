@@ -18,8 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class ForbidImplicitJoinChecker(BaseChecker):
     rule_id = "SQL-JOIN-IMPLICIT-001"
-    name = "禁止隐式JOIN"
-    desc = "禁止用逗号分隔多表（FROM a, b WHERE），请改为显式 JOIN ... ON"
+    name = "禁止隐式关联"
+    desc = "检查是否用逗号分隔多表并在 WHERE 中写关联条件。隐式 JOIN 可读性差，容易遗漏或写错关联条件。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -30,6 +30,6 @@ class ForbidImplicitJoinChecker(BaseChecker):
                 using_clause = node.args.get("using")
                 if kind and kind.upper() == "CROSS" and not on_clause and not using_clause:
                     violations.append(
-                        Violation(message="禁止隐式 JOIN（FROM a, b），请改为显式 JOIN ... ON")
+                        Violation(message="检测到隐式 JOIN（FROM a, b WHERE ...），请改为显式 JOIN ... ON 写法。")
                     )
         return violations

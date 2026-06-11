@@ -18,8 +18,8 @@ from checker.base import BaseChecker, CheckContext, Violation
 
 class SubqueryAliasChecker(BaseChecker):
     rule_id = "SQL-SUBQUERY-ALIAS-001"
-    name = "子查询别名"
-    desc = "所有子查询必须有表别名"
+    name = "子查询需加别名"
+    desc = "检查 FROM 子句中的子查询是否定义了表别名。无别名时无法引用子查询字段。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -29,7 +29,7 @@ class SubqueryAliasChecker(BaseChecker):
                 if not alias:
                     violations.append(
                         Violation(
-                            message="子查询必须有别名，例如 FROM (SELECT ...) t0",
+                            message="子查询缺少表别名，请添加别名，如 FROM (SELECT ...) AS t0。",
                         )
                     )
         return violations

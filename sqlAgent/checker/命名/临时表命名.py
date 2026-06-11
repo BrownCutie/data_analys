@@ -24,8 +24,8 @@ TMP_NAME_PATTERN = re.compile(r"^tmp_[a-z][a-z0-9]*_[a-z][a-z0-9]*(?:_\d{8})?$")
 
 class TempTableNamingChecker(BaseChecker):
     rule_id = "SQL-TEMP-TABLE-001"
-    name = "临时表命名"
-    desc = "临时表命名格式须符合 tmp_{业务域}_{描述}_{日期}"
+    name = "临时表命名规范"
+    desc = "检查临时表命名是否符合 tmp_{业务域}_{描述}_{日期} 格式。规范命名便于管理和问题排查。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -41,7 +41,7 @@ class TempTableNamingChecker(BaseChecker):
                     if not TMP_NAME_PATTERN.match(name):
                         violations.append(
                             Violation(
-                                message=f"临时表 '{name}' 命名不规范，推荐格式: tmp_{{业务域}}_{{描述}}_{{日期}}",
+                                message=f"临时表 '{name}' 命名不规范，请改为 tmp_{{业务域}}_{{描述}}_{{日期}} 格式，如 tmp_user_login_20260501。",
                             )
                         )
         return violations

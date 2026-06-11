@@ -21,8 +21,8 @@ PARTITION_FIELDS = {"pt_d", "pt_h", "pt_m", "pt_w"}
 
 class FilterBeforeJoinChecker(BaseChecker):
     rule_id = "SQL-JOIN-FILTER-001"
-    name = "先过滤后关联"
-    desc = "分区过滤条件必须下推到 JOIN 前的子查询中，不能在外层 JOIN 后才过滤"
+    name = "关联前先过滤"
+    desc = "检查分区条件是否下推到 JOIN 之前的子查询。先过滤再关联可大幅减少参与 JOIN 的数据量。"
 
     def _has_partition_condition(self, where_clause: exp.Expression) -> bool:
         """检查 WHERE 子句中是否包含分区字段"""
@@ -49,7 +49,7 @@ class FilterBeforeJoinChecker(BaseChecker):
                 if self._has_partition_condition(where_clause):
                     violations.append(
                         Violation(
-                            message="分区过滤条件未下推，建议将分区过滤移到 JOIN 前的子查询中"
+                            message="分区过滤条件（pt_d/pt_h/pt_m/pt_w）位于 JOIN 外层，请下推到各表子查询的 WHERE 中。"
                         )
                     )
         return violations

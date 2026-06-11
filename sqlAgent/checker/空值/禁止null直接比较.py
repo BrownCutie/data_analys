@@ -22,8 +22,8 @@ _COMPARE_TYPES = (exp.EQ, exp.NEQ, exp.GT, exp.LT, exp.GTE, exp.LTE)
 
 class ForbidNullCompareChecker(BaseChecker):
     rule_id = "SQL-NULL-COMPARE-001"
-    name = "禁止NULL直接比较"
-    desc = "禁止对 NULL 使用 =、!=、> 等运算符，请使用 IS NULL / IS NOT NULL / NVL()"
+    name = "NULL 比较规范"
+    desc = "检查是否对 NULL 使用了 =、!= 等直接比较。NULL 比较结果恒为 UNKNOWN，应使用专用语法。"
 
     def check(self, ctx: CheckContext) -> list[Violation]:
         violations: list[Violation] = []
@@ -36,7 +36,7 @@ class ForbidNullCompareChecker(BaseChecker):
                 if isinstance(left, exp.Null) or isinstance(right, exp.Null):
                     violations.append(
                         Violation(
-                            message="禁止对 NULL 使用直接比较运算符（=、!=、>、<），请使用 IS NULL / IS NOT NULL / NVL() / COALESCE()"
+                            message="检测到对 NULL 使用直接比较运算符（=、!=、>、<），请改为 IS NULL / IS NOT NULL 或 NVL() / COALESCE()。"
                         )
                     )
         return violations
